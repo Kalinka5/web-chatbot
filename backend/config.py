@@ -1,7 +1,12 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
-uri = "mongodb+srv://kalina003d:lvaYEFI3m9o82heF@chatbot.d32rc.mongodb.net/?retryWrites=true&w=majority&appName=ChatBot"
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+uri = os.getenv('MONGO_DB')
 
 # Create a new client and connect to the server
 client = MongoClient(uri, server_api=ServerApi('1'))
