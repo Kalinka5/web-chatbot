@@ -52,7 +52,7 @@ function App() {
 
   const getMessages = async () => {
     const userId = "user1"; // Replace with dynamic user ID if needed
-    const url = `http://127.0.0.1:8000/messages/${userId}`;
+    const url = `https://web-chatbot-nu.vercel.app/messages/${userId}`;
 
     try {
       const response = await fetch(url, {
@@ -76,7 +76,7 @@ function App() {
 
   const addMessage = async (message) => {
     const userId = "user1"; // Replace with dynamic user ID if needed
-    const url = `http://127.0.0.1:8000/messages/${userId}`;
+    const url = `https://web-chatbot-nu.vercel.app/messages/${userId}`;
 
     try {
       const response = await fetch(url, {
@@ -119,7 +119,7 @@ function App() {
     };
     setMessages((prevMessages) => [botTypping, ...prevMessages]);
 
-    fetch("http://127.0.0.1:8000/predict", {
+    fetch("https://web-chatbot-nu.vercel.app/predict", {
       method: "POST",
       body: JSON.stringify({ message: inputMessage }),
       headers: { "Content-Type": "application/json" },
