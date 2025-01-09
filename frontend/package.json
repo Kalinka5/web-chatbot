@@ -1,13 +1,16 @@
 {
   "name": "frontend",
-  "private": true,
+  "private": false,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "/frontend/",
   "scripts": {
     "dev": "vite",
-    "build": "webpack",
+    "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@r2wc/react-to-web-component": "^2.0.4",
