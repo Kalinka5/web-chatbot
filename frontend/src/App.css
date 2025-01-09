@@ -1,3 +1,9 @@
+.chatbox * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 *,
 html {
   --primaryGradient: linear-gradient(93.12deg, #1b1f98 0.52%, #1d3be7 100%);
@@ -16,11 +22,16 @@ html {
 =============== */
 .chatbox {
   position: absolute;
-  bottom: 30px;
+  bottom: 20%;
   right: 30px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  color: rgba(255, 255, 255, 0.87);
+  line-height: 1.5;
+  font-family: Poppins, sans-serif;
+  font-weight: 400;
+  font-size: 100%;
 
   /* CONTENT IS CLOSE */
   .chatbox__support {
