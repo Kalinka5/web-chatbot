@@ -9,7 +9,7 @@
   const script = document.createElement("script");
   script.type = "module";
   script.src =
-    "https://kalinka5.github.io/web-chatbot/assets/index-XbW74EVx.js";
+    "https://kalinka5.github.io/web-chatbot/assets/index-CTAkveKs.js";
   script.crossOrigin = "anonymous";
   document.head.appendChild(script);
 
