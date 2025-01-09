@@ -3,7 +3,7 @@
   "private": false,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "/frontend/",
+  "homepage": "https://kalinka5.github.io/frontend/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
