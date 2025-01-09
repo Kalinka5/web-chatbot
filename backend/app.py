@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-import uvicorn
+# import uvicorn
 
 from openai import OpenAI
 
@@ -17,8 +17,7 @@ load_dotenv()
 
 deepseek_api_key = os.getenv('DEEPSEEK_API_KEY')
 
-client = OpenAI(api_key=deepseek_api_key,
-                base_url="https://api.deepseek.com")
+client = OpenAI(api_key=deepseek_api_key, base_url="https://api.deepseek.com")
 
 app = FastAPI()
 
@@ -113,5 +112,6 @@ async def write_user_message(user_id: str, message: Message):
     add_message(user_id, message.model_dump())
     return {"detail": "Message added successfully."}
 
-if __name__ == '__main__':
-    uvicorn.run("app:app", reload=True)
+# No need for uvicorn.run() in a serverless environment
+# if __name__ == '__main__':
+#     uvicorn.run("app:app", reload=True)
