@@ -7,7 +7,7 @@
 
   const script = document.createElement("script");
   script.type = "module";
-  script.src = "https://kalinka5.github.io/web-chatbot/assets/chatbot.js";
+  script.src = "https://kalinka5.github.io/web-chatbot/chatbot.js";
   script.crossOrigin = "anonymous";
   document.head.appendChild(script);
 
