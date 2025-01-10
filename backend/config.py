@@ -15,20 +15,20 @@ db = client["chatbot_db"]
 messages_collection = db["messages"]
 
 
-def get_messages(user_id: str):
-    user_data = messages_collection.find_one({"user_id": user_id})
+def get_messages(session_id: str):
+    user_data = messages_collection.find_one({"session_id": session_id})
     if user_data:
         return user_data["messages"]
     return []
 
 
-def add_message(user_id: str, message: dict):
-    user_data = messages_collection.find_one({"user_id": user_id})
+def add_message(session_id: str, message: dict):
+    user_data = messages_collection.find_one({"session_id": session_id})
     if user_data:
         messages_collection.update_one(
-            {"user_id": user_id},
+            {"session_id": session_id},
             {"$push": {"messages": message}}
         )
     else:
         messages_collection.insert_one(
-            {"user_id": user_id, "messages": [message]})
+            {"session_id": session_id, "messages": [message]})

@@ -21,7 +21,7 @@ html {
 /* CHATBOX
 =============== */
 .chatbox {
-  position: absolute;
+  position: fixed;
   bottom: 20%;
   right: 30px;
   display: flex;

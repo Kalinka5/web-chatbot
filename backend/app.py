@@ -1,8 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-# import uvicorn
-
 from openai import OpenAI
 
 import os
@@ -92,26 +90,22 @@ async def predict(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/messages/{user_id}")
-async def read_user_messages(user_id: str):
+@app.get("/messages/{session_id}")
+async def read_user_messages(session_id: str):
     """
     Fetch the list of messages for a given user.
     """
-    messages = get_messages(user_id)
+    messages = get_messages(session_id)
     if not messages:
         raise HTTPException(
             status_code=404, detail="No messages found for the user.")
     return {"messages": messages}
 
 
-@app.post("/messages/{user_id}")
-async def write_user_message(user_id: str, message: Message):
+@app.post("/messages/{session_id}")
+async def write_user_message(session_id: str, message: Message):
     """
     Add a new message to the user's message list.
     """
-    add_message(user_id, message.model_dump())
+    add_message(session_id, message.model_dump())
     return {"detail": "Message added successfully."}
-
-# No need for uvicorn.run() in a serverless environment
-# if __name__ == '__main__':
-#     uvicorn.run("app:app", reload=True)

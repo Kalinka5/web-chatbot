@@ -31,12 +31,24 @@ function App() {
     });
   }, []);
 
+  const getSessionId = () => {
+    let sessionId = localStorage.getItem("chatbot_session_id");
+    if (!sessionId) {
+      sessionId = `session_${Date.now()}_${Math.random()
+        .toString(36)
+        .substring(2, 9)}`;
+      localStorage.setItem("chatbot_session_id", sessionId); // Persist in localStorage
+    }
+    return sessionId;
+  };
+
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
 
   const endChat = () => {
-    console.log("Chat ended"); // Add your end chat logic here
+    localStorage.removeItem("chatbot_session_id"); // Clear the session ID
+    setMessages([]);
     toggleModal();
   };
 
@@ -51,8 +63,8 @@ function App() {
   };
 
   const getMessages = async () => {
-    const userId = "user1"; // Replace with dynamic user ID if needed
-    const url = `https://web-chatbot-nu.vercel.app/messages/${userId}`;
+    const sessionId = getSessionId(); // Replace with dynamic user ID if needed
+    const url = `https://web-chatbot-nu.vercel.app/messages/${sessionId}`;
 
     try {
       const response = await fetch(url, {
@@ -75,8 +87,8 @@ function App() {
   };
 
   const addMessage = async (message) => {
-    const userId = "user1"; // Replace with dynamic user ID if needed
-    const url = `https://web-chatbot-nu.vercel.app/messages/${userId}`;
+    const sessionId = getSessionId(); // Replace with dynamic user ID if needed
+    const url = `https://web-chatbot-nu.vercel.app/messages/${sessionId}`;
 
     try {
       const response = await fetch(url, {
