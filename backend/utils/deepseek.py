@@ -35,6 +35,4 @@ def deepseek_answer(client, file_name, question):
         if answer != "I don\'t have information on that. Please ask another question.":
             break
 
-    splitted_answer = answer.splitlines(keepends=False)
-
-    return splitted_answer
+    return answer

@@ -25,6 +25,8 @@ function App() {
   const [inputMessage, setInputMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const backendLink = "https://web-chatbot-nu.vercel.app";
+
   useEffect(() => {
     getMessages().then((data) => {
       setMessages(data.reverse());
@@ -65,7 +67,7 @@ function App() {
 
   const getMessages = async () => {
     const sessionId = getSessionId(); // Replace with dynamic user ID if needed
-    const url = `http://127.0.0.1:8000/messages/${sessionId}`;
+    const url = `${backendLink}/messages/${sessionId}`;
 
     try {
       const response = await fetch(url, {
@@ -89,7 +91,7 @@ function App() {
 
   const addMessage = async (message) => {
     const sessionId = getSessionId(); // Replace with dynamic user ID if needed
-    const url = `http://127.0.0.1:8000/messages/${sessionId}`;
+    const url = `${backendLink}/messages/${sessionId}`;
 
     try {
       const response = await fetch(url, {
@@ -97,7 +99,7 @@ function App() {
         headers: {
           "Content-Type": "application/json", // Set the content type to JSON
         },
-        body: JSON.stringify([message]), // Convert the message object to a JSON string
+        body: JSON.stringify(message), // Convert the message object to a JSON string
       });
 
       if (!response.ok) {
@@ -132,7 +134,7 @@ function App() {
     };
     setMessages((prevMessages) => [botTypping, ...prevMessages]);
 
-    fetch("http://127.0.0.1:8000/predict", {
+    fetch(`${backendLink}/predict`, {
       method: "POST",
       body: JSON.stringify({ message: inputMessage }),
       headers: { "Content-Type": "application/json" },
@@ -262,12 +264,26 @@ function App() {
                         : "messages__item--operator"
                     }`}
                   >
-                    {Array.isArray(msg.message) ? (
+                    {typeof msg.message === "string" ? (
+                      msg.message.includes("\n") ? (
+                        msg.message
+                          .split(/(?:\r?\n)+/) // Split by newlines
+                          .map((msgContent, i) => <p key={i}>{msgContent}</p>)
+                      ) : (
+                        <p>{msg.message}</p> // Render as a single paragraph if no newlines
+                      )
+                    ) : Array.isArray(msg.message) ? (
                       msg.message.map((msgContent, i) => (
                         <p key={i}>{msgContent}</p>
-                      ))
+                      )) // Render each item if it's an array
                     ) : (
-                      <p>{msg.message}</p>
+                      <div className="is-typing">
+                        <div className="jump1"></div>
+                        <div className="jump2"></div>
+                        <div className="jump3"></div>
+                        <div className="jump4"></div>
+                        <div className="jump5"></div>
+                      </div>
                     )}
                   </div>
                 </div>
