@@ -118,7 +118,7 @@ function App() {
     addMessage(userMessage);
 
     const botTypping = {
-      name: "Sam",
+      name: "Chatbot",
       message: (
         <div className="is-typing">
           <div className="jump1"></div>
@@ -138,7 +138,7 @@ function App() {
     })
       .then((response) => response.json())
       .then((data) => {
-        const botMessage = { name: "Sam", message: data.response };
+        const botMessage = { name: "Chatbot", message: data.response };
 
         // Remove the loading message and add the bot's actual response
         setMessages((prevMessages) => {
@@ -151,7 +151,7 @@ function App() {
         console.error("Error:", error);
 
         const botMessage = {
-          name: "Sam",
+          name: "Chatbot",
           message: "Sorry, something went wrong.",
         };
 
@@ -248,14 +248,14 @@ function App() {
             <div className="chatbox__messages">
               {messages.map((msg, index) => (
                 <div className="message" key={index}>
-                  {msg.name === "Sam" ? (
+                  {msg.name === "Chatbot" ? (
                     <img src={assistant} alt="Chat Support" />
                   ) : (
                     <div></div>
                   )}
                   <div
                     className={`messages__item ${
-                      msg.name === "Sam"
+                      msg.name === "Chatbot"
                         ? "messages__item--visitor"
                         : "messages__item--operator"
                     }`}
