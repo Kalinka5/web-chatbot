@@ -1,12 +1,21 @@
-from utils.scrap_data import make_scrapping
-from utils.urls_browler import save_links
-from utils.urls_sitemap import save_links_sitemap
+from openai import OpenAI
+client = OpenAI()
 
+completion = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "system",
+         "content": (
+                 "You are a helpful assistant. Scrap data from https://kaiduweb.com/ website and answer questions about wesbite. "
+                 "Be concise (under 100 symbols per response), friendly, and clear. "
+                 "Avoid unnecessary details. Use bullet points for lists. "
+                 "Do not use * symbols or explanations. "
+         )},
+        {
+            "role": "user",
+            "content": "When do you open?"
+        }
+    ]
+)
 
-domain = "https://kaiduweb.com/"
-URLS_FOLDER = "static/urls.txt"
-
-
-# links = save_links_sitemap(domain, URLS_FOLDER)
-save_links(domain, URLS_FOLDER)
-make_scrapping()
+print(completion.choices[0].message.content)

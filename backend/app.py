@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 
 from utils.open_ai_assistant import create_thread
 from utils.deepseek import deepseek_answer
+from utils.open_ai import openai_answer
 from config import get_messages, add_message
 from schemas import Message
 

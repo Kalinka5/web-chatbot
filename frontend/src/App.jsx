@@ -29,6 +29,7 @@ function App() {
     getMessages().then((data) => {
       setMessages(data.reverse());
     });
+    console.log(messages);
   }, []);
 
   const getSessionId = () => {
@@ -64,7 +65,7 @@ function App() {
 
   const getMessages = async () => {
     const sessionId = getSessionId(); // Replace with dynamic user ID if needed
-    const url = `https://web-chatbot-nu.vercel.app/messages/${sessionId}`;
+    const url = `http://127.0.0.1:8000/messages/${sessionId}`;
 
     try {
       const response = await fetch(url, {
@@ -88,7 +89,7 @@ function App() {
 
   const addMessage = async (message) => {
     const sessionId = getSessionId(); // Replace with dynamic user ID if needed
-    const url = `https://web-chatbot-nu.vercel.app/messages/${sessionId}`;
+    const url = `http://127.0.0.1:8000/messages/${sessionId}`;
 
     try {
       const response = await fetch(url, {
@@ -96,7 +97,7 @@ function App() {
         headers: {
           "Content-Type": "application/json", // Set the content type to JSON
         },
-        body: JSON.stringify(message), // Convert the message object to a JSON string
+        body: JSON.stringify([message]), // Convert the message object to a JSON string
       });
 
       if (!response.ok) {
@@ -131,13 +132,14 @@ function App() {
     };
     setMessages((prevMessages) => [botTypping, ...prevMessages]);
 
-    fetch("https://web-chatbot-nu.vercel.app/predict", {
+    fetch("http://127.0.0.1:8000/predict", {
       method: "POST",
       body: JSON.stringify({ message: inputMessage }),
       headers: { "Content-Type": "application/json" },
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log(data.response);
         const botMessage = { name: "Chatbot", message: data.response };
 
         // Remove the loading message and add the bot's actual response
@@ -260,7 +262,13 @@ function App() {
                         : "messages__item--operator"
                     }`}
                   >
-                    {msg.message}
+                    {Array.isArray(msg.message) ? (
+                      msg.message.map((msgContent, i) => (
+                        <p key={i}>{msgContent}</p>
+                      ))
+                    ) : (
+                      <p>{msg.message}</p>
+                    )}
                   </div>
                 </div>
               ))}
