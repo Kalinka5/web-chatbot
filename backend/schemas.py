@@ -1,10 +1,10 @@
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List
 
 
 class Message(BaseModel):
-    name: str
-    message: str
+    title: str
+    content: dict
 
 
 class UserMessages(BaseModel):

@@ -97,9 +97,6 @@ async def read_user_messages(session_id: str):
     Fetch the list of messages for a given user.
     """
     messages = get_messages(session_id)
-    if not messages:
-        raise HTTPException(
-            status_code=404, detail="No messages found for the user.")
     return {"messages": messages}
 
 
@@ -108,5 +105,5 @@ async def write_user_message(session_id: str, message: Message):
     """
     Add a new message to the user's message list.
     """
-    add_message(session_id, message.model_dump())
+    add_message(session_id, message)
     return {"detail": "Message added successfully."}
