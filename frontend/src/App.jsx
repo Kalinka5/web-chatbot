@@ -10,7 +10,9 @@ import ChatbotNavbar from "./components/chatbotNavbar";
 import ChatbotFooter from "./components/chatbotFoot";
 import EndChatModal from "./components/endChatModal";
 import OpenChatButton from "./components/openChatButton";
+
 import getSessionId from "./utils/sessionID";
+import api from "./api";
 
 import "./App.css";
 
@@ -40,8 +42,6 @@ function App() {
 
   const [activeButton, setActiveButton] = useState("home");
   const [activePage, setActivePage] = useState("home");
-  // https://web-chatbot-nu.vercel.app
-  const backendLink = "https://web-chatbot-nu.vercel.app";
 
   const isLoggedIn = false;
 
@@ -60,21 +60,16 @@ function App() {
 
   const getMessages = async () => {
     console.log(userID);
-    const url = `${backendLink}/messages/${userID}`;
 
     try {
-      const response = await fetch(url, {
-        method: "GET", // Specify HTTP method
-        headers: {
-          "Content-Type": "application/json", // Set the content type to JSON
-        },
-      });
+      const response = await api.get(`/messages/${userID}`);
+      console.log(response);
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.data;
       console.log("Response from server:", data);
       return data.messages;
     } catch (error) {

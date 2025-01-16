@@ -4,7 +4,7 @@ def split_file_content(file_content, max_length):
         yield " ".join(tokens[i:i + max_length])
 
 
-def deepseek_answer(client, file_name, question):
+def deepseek_answer(client, file_name, question, datetime=""):
     # Read the text file
     with open(file_name, 'r') as file:
         file_content = file.read()
@@ -15,7 +15,7 @@ def deepseek_answer(client, file_name, question):
     answer = "I don\'t have information on that. Please ask another question."
 
     for chunk in chunks:
-        prompt = f"{chunk}\n\nQuestion: {question}"
+        prompt = f"{chunk}\n\nDatetime: {datetime}\n\nQuestion: {question}"
         response = client.chat.completions.create(
             model="deepseek-chat",
             messages=[

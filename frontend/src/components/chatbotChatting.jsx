@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 
 import assistant from "../images/assistant.png";
 
+import api from "../api";
+
 function ChatbotChatting({
   userID,
   messages,
@@ -15,7 +17,6 @@ function ChatbotChatting({
 }) {
   const [listMessages, setListMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
-  const backendLink = "https://web-chatbot-nu.vercel.app";
 
   useEffect(() => {
     // Create a chatTitle dynamically if it's not already set
@@ -41,7 +42,6 @@ function ChatbotChatting({
   };
 
   const addMessage = async (newMessage) => {
-    const url = `${backendLink}/messages/${userID}`;
     const requestData = {
       title: chatTitle,
       content: newMessage,
@@ -49,19 +49,17 @@ function ChatbotChatting({
     console.log(requestData);
 
     try {
-      const response = await fetch(url, {
-        method: "POST", // Specify HTTP method
+      const response = await api.post(`/messages/${userID}`, requestData, {
         headers: {
-          "Content-Type": "application/json", // Set the content type to JSON
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(requestData), // Convert the message object to a JSON string
       });
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.data;
       console.log("Response from server:", data.detail);
 
       // Update the main messages array
@@ -77,6 +75,8 @@ function ChatbotChatting({
 
   const handleSendMessage = () => {
     if (inputMessage.trim() === "") return;
+    const now = new Date();
+    const dateTime = now.toString().replace(" G", ".").split(".")[0];
 
     const userMessage = { name: "User", message: inputMessage };
     console.log(userMessage);
@@ -98,12 +98,20 @@ function ChatbotChatting({
     };
     setListMessages((prevMessages) => [botTypping, ...prevMessages]);
 
-    fetch(`${backendLink}/predict`, {
-      method: "POST",
-      body: JSON.stringify({ message: inputMessage }),
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((response) => response.json())
+    api
+      .post(
+        "/predict",
+        {
+          message: inputMessage,
+          datetime: dateTime,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => response.data)
       .then((data) => {
         console.log(data.response);
         const botMessage = { name: "Chatbot", message: data.response };
