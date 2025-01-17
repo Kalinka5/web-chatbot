@@ -9,7 +9,7 @@ def openai_answer(client, file_name, question, datetime=""):
     with open(file_name, 'r') as file:
         file_content = file.read()
 
-    max_length = 10000  # Approximate token limit for each chunk
+    max_length = 8000  # Approximate token limit for each chunk
     chunks = list(split_file_content(file_content, max_length))
 
     answer = "I don\'t have information on that. Please ask another question."
@@ -25,6 +25,7 @@ def openai_answer(client, file_name, question, datetime=""):
                      "Be concise (under 100 symbols per response), friendly, and clear. "
                      "Avoid unnecessary details. Use bullet points for lists. "
                      "Do not use * symbols or explanations. "
+                     "If user ask about products in store please list 3 item with description, price and web link for each product. "
                  )},
                 {
                     "role": "user",

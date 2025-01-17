@@ -14,4 +14,4 @@ def get_links_sitemap(domain):
 @timer
 def save_links_sitemap(domain, file_name):
     links = get_links_sitemap(domain)
-    save_data_to_file(links, file_name)
+    save_data_to_file(list(set(links)), file_name)

@@ -41,6 +41,14 @@ function ChatbotChatting({
     }
   };
 
+  // Convert markdown-style links to HTML links
+  const convertMarkdownLinks = (text) => {
+    return text.replace(
+      /\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,
+      '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+    );
+  };
+
   const addMessage = async (newMessage) => {
     const requestData = {
       title: chatTitle,
@@ -166,7 +174,16 @@ function ChatbotChatting({
                     msg.message.includes("\n") ? (
                       msg.message
                         .split(/(?:\r?\n)+/) // Split by newlines
-                        .map((msgContent, i) => <p key={i}>{msgContent}</p>)
+                        .map((msgContent, i) => (
+                          <p key={i}>
+                            {" "}
+                            <span
+                              dangerouslySetInnerHTML={{
+                                __html: convertMarkdownLinks(msgContent),
+                              }}
+                            />
+                          </p>
+                        ))
                     ) : (
                       <p>{msg.message}</p> // Render as a single paragraph if no newlines
                     )
