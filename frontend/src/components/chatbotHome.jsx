@@ -1,19 +1,14 @@
 import React from "react";
 
-function ChatbotHome({
-  setActiveButton,
-  setActivePage,
-  messages,
-  setIsChatNew,
-}) {
+function ChatbotHome({ setActiveButton, setActivePage, chats, setIsChatNew }) {
   const handlePrevChat = () => {
-    setActiveButton("messages");
-    setActivePage("messages");
+    setActiveButton("chats");
+    setActivePage("chats");
     setIsChatNew(false);
   };
 
   const handleNewChat = () => {
-    setActiveButton("messages");
+    setActiveButton("chats");
     setActivePage("chatting");
     setIsChatNew(true);
   };
@@ -33,7 +28,7 @@ function ChatbotHome({
             <br /> and I'll find the answers ❓
           </h3>
           <div className="buttons-container animation">
-            {messages.length === 0 ? (
+            {chats.length === 0 ? (
               <>
                 <p className="text center blue">
                   <i>

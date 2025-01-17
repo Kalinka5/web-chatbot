@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 
-import ChatbotHeader from "./components/chatboxHead";
+import ChatbotHeader from "./components/chatbotHead";
 import ChatbotHome from "./components/chatbotHome";
-import ChatbotMessages from "./components/chatbotMessages";
+import ChatbotPrevChats from "./components/chatbotPrevChats";
 import ChatbotHelp from "./components/chatbotHelp";
 import ChatbotChatting from "./components/chatbotChatting";
 import ChatbotNavbar from "./components/chatbotNavbar";
@@ -32,7 +32,7 @@ function App() {
 
   const [isChatboxActive, setIsChatboxActive] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [chats, setChats] = useState([]);
 
   const [isChatNew, setIsChatNew] = useState(false);
   const [chatTitle, setChatTitle] = useState(null);
@@ -52,17 +52,18 @@ function App() {
 
   useEffect(() => {
     if (userID) {
-      getMessages().then((data) => {
-        data && setMessages(data);
+      getChats().then((data) => {
+        data && setChats(data);
+        setIsVisible(true);
       });
     }
   }, [userID]);
 
-  const getMessages = async () => {
+  const getChats = async () => {
     console.log(userID);
 
     try {
-      const response = await api.get(`/messages/${userID}`);
+      const response = await api.get(`/chats/${userID}`);
       console.log(response);
 
       if (response.status !== 200) {
@@ -71,23 +72,21 @@ function App() {
 
       const data = await response.data;
       console.log("Response from server:", data);
-      return data.messages;
+      return data.chats;
     } catch (error) {
       console.error("Error posting message:", error);
     }
   };
 
   return (
-    <div className="chatbox">
+    <div className={`chatbox ${isVisible ? "visible" : ""}`}>
       <div
         className={`chatbox__support ${
           isChatboxActive ? "chatbox--active" : ""
         }`}
-        style={{ zIndex: isVisible ? 123456 : -1 }}
       >
         {/* Header */}
         <ChatbotHeader
-          setIsVisible={setIsVisible}
           isChatboxActive={isChatboxActive}
           setIsChatboxActive={setIsChatboxActive}
           isModalOpen={isModalOpen}
@@ -99,13 +98,13 @@ function App() {
           <ChatbotHome
             setActiveButton={setActiveButton}
             setActivePage={setActivePage}
-            messages={messages}
+            chats={chats}
             setIsChatNew={setIsChatNew}
           />
         )}
-        {activePage === "messages" && (
-          <ChatbotMessages
-            messages={messages}
+        {activePage === "chats" && (
+          <ChatbotPrevChats
+            chats={chats}
             setChatTitle={setChatTitle}
             setChatIndex={setChatIndex}
             setActivePage={setActivePage}
@@ -115,8 +114,8 @@ function App() {
         {activePage === "chatting" && (
           <ChatbotChatting
             userID={userID}
-            messages={messages}
-            setMessages={setMessages}
+            chats={chats}
+            setChats={setChats}
             chatTitle={chatTitle}
             setChatTitle={setChatTitle}
             chatIndex={chatIndex}
@@ -140,13 +139,12 @@ function App() {
         <EndChatModal
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
-          setMessages={setMessages}
+          setChats={setChats}
         />
       </div>
       <OpenChatButton
         isChatboxActive={isChatboxActive}
         setIsChatboxActive={setIsChatboxActive}
-        setIsVisible={setIsVisible}
       />
     </div>
   );

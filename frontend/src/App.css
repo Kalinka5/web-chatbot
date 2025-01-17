@@ -4,6 +4,10 @@
   padding: 0;
 }
 
+body {
+  margin: 0;
+}
+
 *,
 html {
   --primaryGradient: linear-gradient(93.12deg, #1b1f98 0.52%, #1d3be7 100%);
@@ -20,10 +24,18 @@ html {
 
 /* CHATBOX
 =============== */
+.chatbox.visible {
+  z-index: 10;
+  opacity: 1;
+}
 .chatbox {
+  height: 95%;
+  width: 95%;
+  max-width: 400px;
+  max-height: 735px;
   position: fixed;
   bottom: 20%;
-  right: 30px;
+  right: 35px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -32,12 +44,15 @@ html {
   font-family: Poppins, sans-serif;
   font-weight: 400;
   font-size: 100%;
-  z-index: 10;
+  z-index: -1;
+  opacity: 0;
 
   /* CONTENT IS CLOSE */
   .chatbox__support {
-    height: 660px;
-    width: 400px;
+    height: 100%;
+    width: 100%;
+    max-height: 660px;
+    max-width: 400px;
     display: flex;
     flex-direction: column;
     z-index: -1;
@@ -171,8 +186,9 @@ html {
             z-index: 2;
 
             .nav-button {
-              width: 300px;
+              width: 95%;
               height: 50px;
+              max-width: 300px;
               background-color: transparent;
               border-radius: 10px;
               border: #1d3be7 solid 2px;
@@ -629,5 +645,13 @@ html {
   }
   100% {
     opacity: 1;
+  }
+}
+
+/* Media Query For different screens */
+@media (max-height: 950px) {
+  .chatbox {
+    bottom: 10px;
+    right: 10px;
   }
 }

@@ -3,7 +3,6 @@ import React from "react";
 import assistant from "../images/assistant.png";
 
 function ChatbotHeader({
-  setIsVisible,
   isChatboxActive,
   setIsChatboxActive,
   isModalOpen,
@@ -15,11 +14,9 @@ function ChatbotHeader({
 
   const toggleChatbox = () => {
     if (!isChatboxActive) {
-      setIsVisible(true); // Ensure chatbox is visible before animation
-      setTimeout(() => setIsChatboxActive(true), 0); // Trigger open animation
+      setIsChatboxActive(true); // Trigger open animation
     } else {
-      setIsChatboxActive(false); // Trigger close animation
-      setTimeout(() => setIsVisible(false), 300); // Hide after animation completes
+      setIsChatboxActive(false); // Hide after animation completes
     }
   };
 

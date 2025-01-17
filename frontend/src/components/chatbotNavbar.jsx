@@ -20,11 +20,11 @@ function ChatbotNavbar({ activeButton, setActiveButton, setActivePage }) {
         <span>Home</span>
       </button>
       <button
-        className={activeButton === "messages" ? "active" : ""}
-        onClick={() => handleClick("messages")}
+        className={activeButton === "chats" ? "active" : ""}
+        onClick={() => handleClick("chats")}
       >
         <TbMessages className="icon" />
-        <span>Messages</span>
+        <span>Chats</span>
       </button>
       <button
         className={activeButton === "help" ? "active" : ""}

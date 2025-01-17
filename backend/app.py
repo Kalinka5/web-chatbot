@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from utils.open_ai_assistant import create_thread
 from utils.deepseek import deepseek_answer
 from utils.open_ai import openai_answer
-from config import get_messages, add_message
+from config import get_chats, add_message
 from schemas import Message
 
 load_dotenv()
@@ -92,19 +92,19 @@ async def predict(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/messages/{session_id}")
-async def read_user_messages(session_id: str):
+@app.get("/chats/{session_id}")
+async def read_user_chats(session_id: str):
     """
-    Fetch the list of messages for a given user.
+    Fetch the list of chats for a given user.
     """
-    messages = get_messages(session_id)
-    return {"messages": messages}
+    chats = get_chats(session_id)
+    return {"chats": chats}
 
 
-@app.post("/messages/{session_id}")
+@app.post("/chats/{session_id}")
 async def write_user_message(session_id: str, message: Message):
     """
-    Add a new message to the user's message list.
+    Add a new message to the user's cyrrent chat.
     """
     add_message(session_id, message)
     return {"detail": "Message added successfully."}

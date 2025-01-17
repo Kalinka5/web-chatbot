@@ -6,8 +6,8 @@ import api from "../api";
 
 function ChatbotChatting({
   userID,
-  messages,
-  setMessages,
+  chats,
+  setChats,
   chatTitle,
   setChatTitle,
   chatIndex,
@@ -25,13 +25,13 @@ function ChatbotChatting({
       const formattedDate = now.toString().replace(" G", ".").split(".")[0]; // Format as "YYYY-MM-DD HH:MM:SS"
       const title = `Chat ${formattedDate}`;
       setChatTitle(title);
-      setChatIndex(messages.length);
-      setMessages((prevMessages) => {
+      setChatIndex(chats.length);
+      setChats((prevMessages) => {
         return [...prevMessages, { title: title, content: [] }];
       });
       setIsChatNew(false);
     } else {
-      setListMessages(messages[chatIndex]["content"]);
+      setListMessages(chats[chatIndex]["content"]);
     }
   }, []);
 
@@ -49,7 +49,7 @@ function ChatbotChatting({
     console.log(requestData);
 
     try {
-      const response = await api.post(`/messages/${userID}`, requestData, {
+      const response = await api.post(`/chats/${userID}`, requestData, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -63,7 +63,7 @@ function ChatbotChatting({
       console.log("Response from server:", data.detail);
 
       // Update the main messages array
-      setMessages((prevMessages) => {
+      setChats((prevMessages) => {
         const updatedMessages = [...prevMessages];
         updatedMessages[chatIndex].content.unshift(newMessage);
         return updatedMessages;
@@ -128,7 +128,8 @@ function ChatbotChatting({
 
         const botMessage = {
           name: "Chatbot",
-          message: "Sorry, something went wrong.",
+          message:
+            "Oops! 🤖 I'm still a baby bot, learning to chat like a pro! 🍼💻 Could you try rephrasing your question for me? 🚀✨",
         };
 
         // Remove the loading message and add an error message

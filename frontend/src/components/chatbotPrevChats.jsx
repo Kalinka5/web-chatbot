@@ -2,8 +2,8 @@ import React from "react";
 
 import ChatbotImg from "../images/chatbot.png";
 
-function ChatbotMessages({
-  messages,
+function ChatbotPrevChats({
+  chats,
   setChatTitle,
   setActivePage,
   setChatIndex,
@@ -16,12 +16,12 @@ function ChatbotMessages({
 
   return (
     <div className="main-container">
-      {messages.length === 0 ? (
+      {chats.length === 0 ? (
         <div className="no-msgs-container">
           <p className="no-messages">No messages yet...</p>
         </div>
       ) : (
-        messages.map((chat, index) => (
+        chats.map((chat, index) => (
           <div
             key={index}
             className="chat-item"
@@ -52,4 +52,4 @@ function ChatbotMessages({
   );
 }
 
-export default ChatbotMessages;
+export default ChatbotPrevChats;

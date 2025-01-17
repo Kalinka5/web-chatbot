@@ -3,14 +3,12 @@ import React from "react";
 import chatBotIcon from "../images/chatbox-icon.svg";
 import closeChatBotIcon from "../images/close-icon.svg";
 
-function OpenChatButton({ isChatboxActive, setIsChatboxActive, setIsVisible }) {
+function OpenChatButton({ isChatboxActive, setIsChatboxActive }) {
   const toggleChatbox = () => {
     if (!isChatboxActive) {
-      setIsVisible(true); // Ensure chatbox is visible before animation
-      setTimeout(() => setIsChatboxActive(true), 0); // Trigger open animation
+      setIsChatboxActive(true); // Trigger open animation
     } else {
-      setIsChatboxActive(false); // Trigger close animation
-      setTimeout(() => setIsVisible(false), 300); // Hide after animation completes
+      setIsChatboxActive(false); // Hide after animation completes
     }
   };
 

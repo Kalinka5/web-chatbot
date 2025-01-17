@@ -15,12 +15,12 @@ db = client["chatbot_db"]
 messages_collection = db["messages"]
 
 
-def get_messages(session_id: str):
+def get_chats(session_id: str):
     user_data = messages_collection.find_one({"session_id": session_id})
     if user_data:
-        all_messages = [{"title": chat["title"], "content": chat["content"][::-1]}
-                        for chat in user_data["messages"]]
-        return all_messages
+        all_chats = [{"title": chat["title"], "content": chat["content"][::-1]}
+                     for chat in user_data["messages"]]
+        return all_chats
     return []
 
 
