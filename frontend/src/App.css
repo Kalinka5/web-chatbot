@@ -2,6 +2,15 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  outline: none !important;
+}
+
+.message-list li {
+  list-style-type: none; /* Disable default list markers */
+}
+
+.message-list ::marker {
+  display: none !important;
 }
 
 body {
@@ -11,11 +20,7 @@ body {
 *,
 html {
   --primaryGradient: linear-gradient(93.12deg, #1b1f98 0.52%, #1d3be7 100%);
-  --secondaryGradient: linear-gradient(
-    268.91deg,
-    #1b1f98 -2.14%,
-    #1d3be7 99.69%
-  );
+  --secondaryGradient: linear-gradient(268.91deg, #1b1f98 -2.14%, #1d3be7 99.69%);
   --primaryBoxShadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
   --secondaryBoxShadow: 0px -10px 15px rgba(0, 0, 0, 0.1);
   --primary: #1b1f98;
@@ -142,12 +147,7 @@ html {
           z-index: 2;
           backdrop-filter: blur(5px); /* Apply blur effect */
           -webkit-backdrop-filter: blur(5px); /* Support for Webkit browsers */
-          background-color: rgba(
-            255,
-            255,
-            255,
-            0.3
-          ); /* Optional: Add semi-transparent background */
+          background-color: rgba(255, 255, 255, 0.3); /* Optional: Add semi-transparent background */
           height: 100%;
           width: 100%;
           display: flex;
@@ -290,6 +290,10 @@ html {
               width: fit-content;
               max-width: 80%;
 
+              .chat-links {
+                color: rgb(0, 0, 238);
+                text-decoration: underline;
+              }
               .chatbot-message {
                 font-size: 18px;
                 font-family: "Arial", sans-serif;

@@ -1,20 +1,12 @@
 import React, { useEffect, useState } from "react";
 
+import ReactMarkdown from "react-markdown";
+
 import assistant from "../images/assistant.png";
 
 import api from "../api";
 
-function ChatbotChatting({
-  userID,
-  chats,
-  setChats,
-  chatTitle,
-  setChatTitle,
-  chatIndex,
-  setChatIndex,
-  isChatNew,
-  setIsChatNew,
-}) {
+function ChatbotChatting({ userID, chats, setChats, chatTitle, setChatTitle, chatIndex, setChatIndex, isChatNew, setIsChatNew }) {
   const [listMessages, setListMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
 
@@ -39,14 +31,6 @@ function ChatbotChatting({
     if (event.key === "Enter") {
       handleSendMessage();
     }
-  };
-
-  // Convert markdown-style links to HTML links
-  const convertMarkdownLinks = (text) => {
-    return text.replace(
-      /\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,
-      '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
-    );
   };
 
   const addMessage = async (newMessage) => {
@@ -136,8 +120,7 @@ function ChatbotChatting({
 
         const botMessage = {
           name: "Chatbot",
-          message:
-            "Oops! 🤖 I'm still a baby bot, learning to chat like a pro! 🍼💻 Could you try rephrasing your question for me? 🚀✨",
+          message: "Oops! 🤖 I'm still a baby bot, learning to chat like a pro! 🍼💻 Could you try rephrasing your question for me? 🚀✨",
         };
 
         // Remove the loading message and add an error message
@@ -158,39 +141,25 @@ function ChatbotChatting({
           {listMessages &&
             listMessages.map((msg, index) => (
               <div className="message" key={index}>
-                {msg.name === "Chatbot" ? (
-                  <img src={assistant} alt="Chat Support" />
-                ) : (
-                  <div></div>
-                )}
-                <div
-                  className={`messages__item ${
-                    msg.name === "Chatbot"
-                      ? "messages__item--visitor"
-                      : "messages__item--operator"
-                  }`}
-                >
+                {msg.name === "Chatbot" ? <img src={assistant} alt="Chat Support" /> : <div></div>}
+                <div className={`messages__item ${msg.name === "Chatbot" ? "messages__item--visitor" : "messages__item--operator"}`}>
                   {typeof msg.message === "string" ? (
                     msg.message.includes("\n") ? (
                       msg.message
-                        .split(/(?:\r?\n)+/) // Split by newlines
+                        .split("\n") // Split by newlines
                         .map((msgContent, i) => (
-                          <p key={i}>
-                            {" "}
-                            <span
-                              dangerouslySetInnerHTML={{
-                                __html: convertMarkdownLinks(msgContent),
-                              }}
-                            />
-                          </p>
+                          <div className="message-list" key={i}>
+                            <ReactMarkdown>{msgContent}</ReactMarkdown>
+                            {i !== msg.message.split("\n").length - 1 && <p style={{ margin: "16px 0" }}></p>}
+                          </div>
                         ))
                     ) : (
-                      <p>{msg.message}</p> // Render as a single paragraph if no newlines
+                      <div className="message-list">
+                        <ReactMarkdown>{msg.message}</ReactMarkdown>
+                      </div> // Render as a single paragraph if no newlines
                     )
                   ) : Array.isArray(msg.message) ? (
-                    msg.message.map((msgContent, i) => (
-                      <p key={i}>{msgContent}</p>
-                    )) // Render each item if it's an array
+                    msg.message.map((msgContent, i) => <p key={i}>{msgContent}</p>) // Render each item if it's an array
                   ) : (
                     <div className="is-typing">
                       <div className="jump1"></div>
@@ -207,9 +176,7 @@ function ChatbotChatting({
             <img src={assistant} alt="Chat Support" />
             <div className="messages__item messages__item--visitor">
               <p className="chatbot-message">Hello, I'm a Chatbot. 🤖</p>
-              <p className="chatbot-message">
-                I can help you with all information about Kaidu platform. 📚
-              </p>
+              <p className="chatbot-message">I can help you with all information about Kaidu platform. 📚</p>
               <p className="chatbot-message">Ask me a question. ❓</p>
             </div>
           </div>
