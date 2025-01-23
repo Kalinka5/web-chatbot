@@ -8,7 +8,7 @@ import ChatbotHelp from "./components/chatbotHelp";
 import ChatbotChatting from "./components/chatbotChatting";
 import ChatbotNavbar from "./components/chatbotNavbar";
 import ChatbotFooter from "./components/chatbotFoot";
-import EndChatModal from "./components/endChatModal";
+import ChatModal from "./components/ChatModal";
 import OpenChatButton from "./components/openChatButton";
 
 import getSessionId from "./utils/sessionID";
@@ -34,11 +34,14 @@ function App() {
   const [isVisible, setIsVisible] = useState(false);
   const [chats, setChats] = useState([]);
 
-  const [isChatNew, setIsChatNew] = useState(false);
-  const [chatTitle, setChatTitle] = useState(null);
-  const [chatIndex, setChatIndex] = useState(0);
+  const [numChatsToShow, setNumChatsToShow] = useState(5); // Default to 5 chats
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [chatTitle, setChatTitle] = useState(null);
+  const [chatIndex, setChatIndex] = useState(-1);
+
+  const [isEndChatModalOpen, setIsEndChatModalOpen] = useState(false);
+  const [isDeleteChatsOpen, setIsDeleteChatsOpen] = useState(false);
+  const [isSessionPrompt, setIsSessionPrompt] = useState(false);
 
   const [activeButton, setActiveButton] = useState("home");
   const [activePage, setActivePage] = useState("home");
@@ -53,11 +56,30 @@ function App() {
   useEffect(() => {
     if (userID) {
       getChats().then((data) => {
-        data && setChats(data);
+        if (data) {
+          setChats(data.slice(-numChatsToShow, data.length));
+        }
         setIsVisible(true);
       });
     }
-  }, [userID]);
+  }, [userID, numChatsToShow]);
+
+  const toggleModal = ({ isModalOpen, onHandle }) => {
+    onHandle(!isModalOpen);
+  };
+
+  const clearChats = (isDeleteChatsOpen, setIsDeleteChatsOpen) => {
+    localStorage.removeItem("chatbot_session_id"); // Clear the session ID
+    setChats([]);
+    toggleModal(isDeleteChatsOpen, setIsDeleteChatsOpen);
+  };
+
+  const endChat = () => {
+    console.log("Ending Chat...");
+    // sessionStorage.removeItem("hasSessionPrompt"); // Reset session prompt
+    // setIsSessionPrompt(true); // Show session prompt
+    // setIsEndChatModalOpen(false); // Close modal
+  };
 
   const getChats = async () => {
     console.log(userID);
@@ -80,38 +102,17 @@ function App() {
 
   return (
     <div className={`chatbox ${isVisible ? "visible" : ""}`}>
-      <div
-        className={`chatbox__support ${
-          isChatboxActive ? "chatbox--active" : ""
-        }`}
-      >
+      <div className={`chatbox__support ${isChatboxActive ? "chatbox--active" : ""}`}>
         {/* Header */}
         <ChatbotHeader
           isChatboxActive={isChatboxActive}
           setIsChatboxActive={setIsChatboxActive}
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
+          isModalOpen={isEndChatModalOpen}
+          setIsModalOpen={setIsEndChatModalOpen}
         />
 
         {/* Main Part */}
-        {activePage === "home" && (
-          <ChatbotHome
-            setActiveButton={setActiveButton}
-            setActivePage={setActivePage}
-            chats={chats}
-            setIsChatNew={setIsChatNew}
-          />
-        )}
-        {activePage === "chats" && (
-          <ChatbotPrevChats
-            chats={chats}
-            setChatTitle={setChatTitle}
-            setChatIndex={setChatIndex}
-            setActivePage={setActivePage}
-          />
-        )}
-        {activePage === "help" && <ChatbotHelp />}
-        {activePage === "chatting" && (
+        {activePage === "home" && isVisible && (
           <ChatbotChatting
             userID={userID}
             chats={chats}
@@ -120,32 +121,49 @@ function App() {
             setChatTitle={setChatTitle}
             chatIndex={chatIndex}
             setChatIndex={setChatIndex}
-            isChatNew={isChatNew}
-            setIsChatNew={setIsChatNew}
+            isSessionPrompt={isSessionPrompt}
+            setIsSessionPrompt={setIsSessionPrompt}
           />
         )}
+        {activePage === "chats" && (
+          <ChatbotPrevChats
+            chats={chats}
+            setChatTitle={setChatTitle}
+            setChatIndex={setChatIndex}
+            setActivePage={setActivePage}
+            setActiveButton={setActiveButton}
+            numChatsToShow={numChatsToShow}
+            setNumChatsToShow={setNumChatsToShow}
+            setIsSessionPrompt={setIsSessionPrompt}
+          />
+        )}
+        {activePage === "help" && <ChatbotHelp />}
 
         {/* Navigation Bar */}
-        <ChatbotNavbar
-          activeButton={activeButton}
-          setActiveButton={setActiveButton}
-          setActivePage={setActivePage}
-        />
+        <ChatbotNavbar activeButton={activeButton} setActiveButton={setActiveButton} setActivePage={setActivePage} />
 
         {/* Footer */}
         <ChatbotFooter />
 
         {/* Modals */}
-        <EndChatModal
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
-          setChats={setChats}
+        <ChatModal
+          isModalOpen={isEndChatModalOpen}
+          setIsModalOpen={setIsEndChatModalOpen}
+          onClick={endChat}
+          headText="End Chat"
+          question="Are you sure you want to end this chat?"
+          buttonText="End chat"
+        />
+        <ChatModal
+          isModalOpen={isDeleteChatsOpen}
+          setIsModalOpen={setIsDeleteChatsOpen}
+          onClick={clearChats}
+          headText="Delete Chat History"
+          question="Are you sure you want to delete all chat history?"
+          buttonText="Delete history"
         />
       </div>
-      <OpenChatButton
-        isChatboxActive={isChatboxActive}
-        setIsChatboxActive={setIsChatboxActive}
-      />
+      <OpenChatButton isChatboxActive={isChatboxActive} setIsChatboxActive={setIsChatboxActive} />
     </div>
   );
 }

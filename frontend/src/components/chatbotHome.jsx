@@ -8,7 +8,6 @@ function ChatbotHome({ setActiveButton, setActivePage, chats, setIsChatNew }) {
   };
 
   const handleNewChat = () => {
-    setActiveButton("chats");
     setActivePage("chatting");
     setIsChatNew(true);
   };
@@ -19,9 +18,7 @@ function ChatbotHome({ setActiveButton, setActivePage, chats, setIsChatNew }) {
         <div className="blur-effect">
           <div className="text-container animation">
             <h2 className="text blue">Hello, I'm an AI Assistant 🤖</h2>
-            <h3 className="text light-blue">
-              I can help you with all information about Kaidu platform 📚
-            </h3>
+            <h3 className="text light-blue">I can help you with all information about Kaidu platform 📚</h3>
           </div>
           <h3 className="text question-text animation">
             Let’s get to it! Ask me anything, ❓
@@ -31,10 +28,7 @@ function ChatbotHome({ setActiveButton, setActivePage, chats, setIsChatNew }) {
             {chats.length === 0 ? (
               <>
                 <p className="text center blue">
-                  <i>
-                    Feel free to ask your questions, and I'll do my best to
-                    help. What’s on your mind?
-                  </i>
+                  <i>Feel free to ask your questions, and I'll do my best to help. What’s on your mind?</i>
                 </p>
                 <button className="nav-button" onClick={handleNewChat}>
                   New Chat
@@ -42,10 +36,7 @@ function ChatbotHome({ setActiveButton, setActivePage, chats, setIsChatNew }) {
               </>
             ) : (
               <>
-                <p className="text center blue">
-                  Do you want continue with your previous session or start a new
-                  chat?
-                </p>
+                <p className="text center blue">Do you want continue with your previous session or start a new chat?</p>
                 <button className="nav-button" onClick={handlePrevChat}>
                   Previous Session
                 </button>
