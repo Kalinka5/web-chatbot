@@ -1,14 +1,8 @@
-from utils.open_ai import openai_answer
-
-from openai import OpenAI
+from utils.scraplib import Scraplib
 
 
-client = OpenAI()
-
-answer = openai_answer(
-    client=client,
-    file_name='static/not_repeated_data.txt',
-    question='Do you have brackets?'
-)
-
-print(answer)
+scraplib = Scraplib('https://kaiduweb.ctwiii.com/')
+urls = scraplib.urls_sitemap()
+scraplib.save_urls_to_file(urls, 'urls_new_domain.txt')
+data = scraplib.scrap_all_pages('urls_new_domain.txt')
+scraplib.save_data_to_file(data, 'data_new_domain.txt')

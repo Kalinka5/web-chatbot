@@ -80,7 +80,7 @@ async def predict(request: Request):
             raise HTTPException(status_code=400, detail="No question provided")
 
         response_message = openai_answer(
-            client, 'static/not_repeated_data.txt', user_question, user_datetime)
+            client, 'static/data_new_domain.txt', user_question, user_datetime)
 
         # Check if a response was generated
         if response_message:

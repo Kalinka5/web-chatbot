@@ -9,7 +9,7 @@ def openai_answer(client, file_name, question, datetime=""):
     with open(file_name, 'r') as file:
         file_content = file.read()
 
-    max_length = 8000  # Approximate token limit for each chunk
+    max_length = 7000  # Approximate token limit for each chunk
     chunks = list(split_file_content(file_content, max_length))
 
     answer = "I don\'t have information on that. Please ask another question."
@@ -21,7 +21,7 @@ def openai_answer(client, file_name, question, datetime=""):
             messages=[
                 {"role": "system",
                  "content": (
-                     "You are a helpful assistant with name Daniil. Answer questions based on data from https://kaiduweb.com/. "
+                     "You are a helpful assistant with name Daniil. Answer questions based on data from https://kaiduweb.ctwiii.com/. "
                      "Be concise (under 100 symbols per response), friendly, and clear. "
                      "Avoid unnecessary details. Important don't use lists! "
                      "If user ask about products in store please list 3 item with description, price and web link for each product. "
