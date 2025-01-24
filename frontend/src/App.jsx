@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 
 import ChatbotHeader from "./components/chatbotHead";
-import ChatbotHome from "./components/chatbotHome";
 import ChatbotPrevChats from "./components/chatbotPrevChats";
 import ChatbotHelp from "./components/chatbotHelp";
 import ChatbotChatting from "./components/chatbotChatting";
@@ -30,23 +29,28 @@ window.ChatWidget = { initialize: initializeChatWidget };
 function App() {
   const [userID, setUserID] = useState("");
 
+  // Display main part of Chat bot
   const [isChatboxActive, setIsChatboxActive] = useState(false);
+  // Display Open/Close Chat bot button when chats was gotten
   const [isVisible, setIsVisible] = useState(false);
+
+  const [activePage, setActivePage] = useState("home"); // Main page
   const [chats, setChats] = useState([]);
-
   const [numChatsToShow, setNumChatsToShow] = useState(5); // Default to 5 chats
+  // Control reloading page (Previous session or new chat)
+  const [isSessionPrompt, setIsSessionPrompt] = useState(false);
 
-  const [chatTitle, setChatTitle] = useState(null);
-  const [chatIndex, setChatIndex] = useState(-1);
+  const [lastChat, setLastChat] = useState({
+    chatTitle: null,
+    chatIndex: -1,
+    messages: [],
+    isInputEnabled: false,
+  });
 
   const [isEndChatModalOpen, setIsEndChatModalOpen] = useState(false);
   const [isDeleteChatsOpen, setIsDeleteChatsOpen] = useState(false);
-  const [isSessionPrompt, setIsSessionPrompt] = useState(false);
 
-  const [activeButton, setActiveButton] = useState("home");
-  const [activePage, setActivePage] = useState("home");
-
-  const isLoggedIn = false;
+  const isLoggedIn = false; // In future
 
   useEffect(() => {
     const sessionId = isLoggedIn ? "TestUser" : getSessionId();
@@ -64,21 +68,28 @@ function App() {
     }
   }, [userID, numChatsToShow]);
 
-  const toggleModal = ({ isModalOpen, onHandle }) => {
-    onHandle(!isModalOpen);
+  const toggleChatbox = () => {
+    setIsChatboxActive(!isChatboxActive); // Trigger open animation
   };
 
-  const clearChats = (isDeleteChatsOpen, setIsDeleteChatsOpen) => {
+  const clearChats = () => {
     localStorage.removeItem("chatbot_session_id"); // Clear the session ID
     setChats([]);
-    toggleModal(isDeleteChatsOpen, setIsDeleteChatsOpen);
+    setIsDeleteChatsOpen(!isDeleteChatsOpen);
   };
 
   const endChat = () => {
     console.log("Ending Chat...");
-    // sessionStorage.removeItem("hasSessionPrompt"); // Reset session prompt
-    // setIsSessionPrompt(true); // Show session prompt
-    // setIsEndChatModalOpen(false); // Close modal
+    setLastChat(() => ({
+      chatTitle: null,
+      chatIndex: -1,
+      messages: [],
+      isInputEnabled: false,
+    }));
+    sessionStorage.removeItem("hasSessionPrompt"); // Reset session prompt
+    setIsSessionPrompt(true); // Show session prompt
+    setIsEndChatModalOpen(false); // Close modal
+    setActivePage("home");
   };
 
   const getChats = async () => {
@@ -104,12 +115,7 @@ function App() {
     <div className={`chatbox ${isVisible ? "visible" : ""}`}>
       <div className={`chatbox__support ${isChatboxActive ? "chatbox--active" : ""}`}>
         {/* Header */}
-        <ChatbotHeader
-          isChatboxActive={isChatboxActive}
-          setIsChatboxActive={setIsChatboxActive}
-          isModalOpen={isEndChatModalOpen}
-          setIsModalOpen={setIsEndChatModalOpen}
-        />
+        <ChatbotHeader onClick={toggleChatbox} isModalOpen={isEndChatModalOpen} setIsModalOpen={setIsEndChatModalOpen} />
 
         {/* Main Part */}
         {activePage === "home" && isVisible && (
@@ -117,10 +123,8 @@ function App() {
             userID={userID}
             chats={chats}
             setChats={setChats}
-            chatTitle={chatTitle}
-            setChatTitle={setChatTitle}
-            chatIndex={chatIndex}
-            setChatIndex={setChatIndex}
+            lastChat={lastChat}
+            setLastChat={setLastChat}
             isSessionPrompt={isSessionPrompt}
             setIsSessionPrompt={setIsSessionPrompt}
           />
@@ -128,10 +132,8 @@ function App() {
         {activePage === "chats" && (
           <ChatbotPrevChats
             chats={chats}
-            setChatTitle={setChatTitle}
-            setChatIndex={setChatIndex}
+            setLastChat={setLastChat}
             setActivePage={setActivePage}
-            setActiveButton={setActiveButton}
             numChatsToShow={numChatsToShow}
             setNumChatsToShow={setNumChatsToShow}
             setIsSessionPrompt={setIsSessionPrompt}
@@ -140,10 +142,10 @@ function App() {
         {activePage === "help" && <ChatbotHelp />}
 
         {/* Navigation Bar */}
-        <ChatbotNavbar activeButton={activeButton} setActiveButton={setActiveButton} setActivePage={setActivePage} />
+        <ChatbotNavbar activePage={activePage} setActivePage={setActivePage} />
 
         {/* Footer */}
-        <ChatbotFooter />
+        <ChatbotFooter poweredBy="Daniil Kalinevych" />
 
         {/* Modals */}
         <ChatModal
@@ -163,7 +165,7 @@ function App() {
           buttonText="Delete history"
         />
       </div>
-      <OpenChatButton isChatboxActive={isChatboxActive} setIsChatboxActive={setIsChatboxActive} />
+      <OpenChatButton isChatboxActive={isChatboxActive} onClick={toggleChatbox} />
     </div>
   );
 }

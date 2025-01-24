@@ -2,22 +2,9 @@ import React from "react";
 
 import assistant from "../images/assistant.png";
 
-function ChatbotHeader({
-  isChatboxActive,
-  setIsChatboxActive,
-  isModalOpen,
-  setIsModalOpen,
-}) {
+function ChatbotHeader({ onClick, isModalOpen, setIsModalOpen }) {
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
-  };
-
-  const toggleChatbox = () => {
-    if (!isChatboxActive) {
-      setIsChatboxActive(true); // Trigger open animation
-    } else {
-      setIsChatboxActive(false); // Hide after animation completes
-    }
   };
 
   return (
@@ -59,7 +46,7 @@ function ChatbotHeader({
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            onClick={toggleChatbox}
+            onClick={onClick}
           >
             <path d="M5 12h14"></path>
           </svg>

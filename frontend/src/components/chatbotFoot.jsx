@@ -1,10 +1,10 @@
 import React from "react";
 
-function ChatbotFooter() {
+function ChatbotFooter({ poweredBy }) {
   return (
     <div className="chatbox__footer">
       <p className="powered">
-        Powered by <a href="#">Daniil Kalinevych</a>
+        Powered by <a href="#">{poweredBy}</a>
       </p>
     </div>
   );

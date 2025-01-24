@@ -2,14 +2,17 @@ import React from "react";
 
 import ChatbotImg from "../images/chatbot.png";
 
-function ChatbotPrevChats({ chats, setChatTitle, setActivePage, setActiveButton, setChatIndex, numChatsToShow, setNumChatsToShow, setIsSessionPrompt }) {
+function ChatbotPrevChats({ chats, setLastChat, setActivePage, numChatsToShow, setNumChatsToShow, setIsSessionPrompt }) {
   const handleChooseChat = (chatTitle, chatIndex) => {
     sessionStorage.setItem("hasSessionPrompt", "true");
     setIsSessionPrompt(false);
-    setChatTitle(chatTitle);
-    setChatIndex(chatIndex);
+    setLastChat((prevChat) => ({
+      ...prevChat,
+      chatTitle: chatTitle,
+      chatIndex: chatIndex,
+      isInputEnabled: true,
+    }));
     setActivePage("home");
-    setActiveButton("home");
   };
 
   const handleRadioChange = (event) => {

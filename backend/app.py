@@ -14,10 +14,10 @@ from schemas import Message
 
 load_dotenv()
 
-# deepseek_api_key = os.getenv('DEEPSEEK_API_KEY')
+deepseek_api_key = os.getenv('DEEPSEEK_API_KEY')
 
-# client = OpenAI(api_key=deepseek_api_key, base_url="https://api.deepseek.com")
-client = OpenAI()
+client = OpenAI(api_key=deepseek_api_key, base_url="https://api.deepseek.com")
+# client = OpenAI()  # For gpt-4o
 app = FastAPI()
 
 # Add CORS middleware
@@ -79,8 +79,12 @@ async def predict(request: Request):
         if not user_question:
             raise HTTPException(status_code=400, detail="No question provided")
 
-        response_message = openai_answer(
-            client, 'static/data_new_domain.txt', user_question, user_datetime)
+        response_message = deepseek_answer(
+            client,
+            'static/data_new_domain.txt',
+            user_question,
+            user_datetime
+        )
 
         # Check if a response was generated
         if response_message:

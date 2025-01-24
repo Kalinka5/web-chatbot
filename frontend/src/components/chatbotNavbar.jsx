@@ -4,32 +4,18 @@ import { IoIosHome } from "react-icons/io";
 import { TbMessages } from "react-icons/tb";
 import { IoIosHelpCircleOutline } from "react-icons/io";
 
-function ChatbotNavbar({ activeButton, setActiveButton, setActivePage }) {
-  const handleClick = (buttonName) => {
-    setActiveButton(buttonName);
-    setActivePage(buttonName);
-  };
-
+function ChatbotNavbar({ activePage, setActivePage }) {
   return (
     <div className="navbar">
-      <button
-        className={activeButton === "home" ? "active" : ""}
-        onClick={() => handleClick("home")}
-      >
+      <button className={activePage === "home" ? "active" : ""} onClick={() => setActivePage("home")}>
         <IoIosHome className="icon" />
         <span>Home</span>
       </button>
-      <button
-        className={activeButton === "chats" ? "active" : ""}
-        onClick={() => handleClick("chats")}
-      >
+      <button className={activePage === "chats" ? "active" : ""} onClick={() => setActivePage("chats")}>
         <TbMessages className="icon" />
         <span>Chats</span>
       </button>
-      <button
-        className={activeButton === "help" ? "active" : ""}
-        onClick={() => handleClick("help")}
-      >
+      <button className={activePage === "help" ? "active" : ""} onClick={() => setActivePage("help")}>
         <IoIosHelpCircleOutline className="icon" />
         <span>Help</span>
       </button>

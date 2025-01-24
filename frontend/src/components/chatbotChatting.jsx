@@ -6,11 +6,9 @@ import assistant from "../images/assistant.png";
 
 import api from "../api";
 
-function ChatbotChatting({ userID, chats, setChats, chatTitle, setChatTitle, chatIndex, setChatIndex, isSessionPrompt, setIsSessionPrompt }) {
-  const [listMessages, setListMessages] = useState([]);
+function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSessionPrompt, setIsSessionPrompt }) {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [isInputEnabled, setIsInputEnabled] = useState(true);
 
   useEffect(() => {
     // Clear session prompt state on reload
@@ -25,7 +23,10 @@ function ChatbotChatting({ userID, chats, setChats, chatTitle, setChatTitle, cha
       // If the session prompt was already shown, load the chat or start a new session
       console.log("Session prompt already handled.");
       if (chats.length > 0) {
-        setListMessages(chats.at(chatIndex).content); // Load previous chat
+        setLastChat((prevChat) => ({
+          ...prevChat,
+          messages: chats.at(lastChat.chatIndex).content,
+        }));
       } else {
         handleNewChat(); // Start a new chat if no chats exist
       }
@@ -36,7 +37,10 @@ function ChatbotChatting({ userID, chats, setChats, chatTitle, setChatTitle, cha
       // First page load or reload: show session prompt
       console.log("Displaying session prompt.");
       setIsSessionPrompt(true); // Show session prompt
-      setIsInputEnabled(false); // Disable input until a decision is made
+      setLastChat((prevChat) => ({
+        ...prevChat,
+        isInputEnabled: false,
+      })); // Disable input until a decision is made
     }
 
     return () => {
@@ -48,9 +52,15 @@ function ChatbotChatting({ userID, chats, setChats, chatTitle, setChatTitle, cha
   const handlePreviousSession = () => {
     sessionStorage.setItem("hasSessionPrompt", "true");
     setIsSessionPrompt(false); // Hide session prompt
-    setIsInputEnabled(true); // Show input field with Send button
+    setLastChat((prevChat) => ({
+      ...prevChat,
+      isInputEnabled: true,
+    }));
     if (chats.length > 0) {
-      setListMessages(chats.at(chatIndex).content); // Load previous chat
+      setLastChat((prevChat) => ({
+        ...prevChat,
+        messages: chats.at(lastChat.chatIndex).content, // Load previous chat
+      }));
     }
     // Display a welcome message
     displayAnimatedMessage("Hi there! 🌟 Welcome to our chat! How can I assist you today? 🚀");
@@ -62,12 +72,15 @@ function ChatbotChatting({ userID, chats, setChats, chatTitle, setChatTitle, cha
     const formattedDate = now.toString().replace(" G", ".").split(".")[0]; // Format as "YYYY-MM-DD HH:MM:SS"
     const title = `Chat ${formattedDate}`;
 
-    setChatTitle(title);
-    setChatIndex(chats.length);
+    setLastChat(() => ({
+      chatTitle: title,
+      chatIndex: chats.length,
+      messages: [],
+      isInputEnabled: true,
+    }));
+
     setChats((prevMessages) => [...prevMessages, { title: title, content: [] }]);
-    setListMessages([]);
     setIsSessionPrompt(false); // Hide session prompt
-    setIsInputEnabled(true); // Enable input
 
     // Display a welcome message
     displayAnimatedMessage(
@@ -82,18 +95,28 @@ function ChatbotChatting({ userID, chats, setChats, chatTitle, setChatTitle, cha
     let index = 0;
 
     // Insert a placeholder for the animated starting message at the top
-    setListMessages((prevMessages) => [
-      ...prevMessages, // Keep existing messages below
-      { name: "Chatbot", message: "" }, // Placeholder for animation
-    ]);
+    setLastChat((prevChat) => ({
+      ...prevChat,
+      messages: [...prevChat.messages, { name: "Chatbot", message: "" }],
+    }));
 
     const interval = setInterval(() => {
       if (index < fullMessage.length) {
         currentMessage += fullMessage[index];
-        setListMessages((prevMessages) => {
-          const updatedMessages = [...prevMessages];
-          updatedMessages[updatedMessages.length - 1] = { name: "Chatbot", message: currentMessage }; // Update only the first message
-          return updatedMessages;
+        setLastChat((prevChat) => {
+          // Create a shallow copy of the existing messages array
+          const updatedMessages = [...prevChat.messages];
+          // Update the last message in the array
+          updatedMessages[updatedMessages.length - 1] = {
+            name: "Chatbot",
+            message: currentMessage,
+          };
+
+          // Return the updated chat object
+          return {
+            ...prevChat, // Preserve other properties of the chat object
+            messages: updatedMessages, // Update the messages property
+          };
         });
         index++;
       } else {
@@ -110,7 +133,7 @@ function ChatbotChatting({ userID, chats, setChats, chatTitle, setChatTitle, cha
 
   const addMessage = async (newMessage) => {
     const requestData = {
-      title: chatTitle,
+      title: lastChat.chatTitle,
       content: newMessage,
     };
     console.log(requestData);
@@ -132,7 +155,7 @@ function ChatbotChatting({ userID, chats, setChats, chatTitle, setChatTitle, cha
       // Update the main messages array
       setChats((prevMessages) => {
         const updatedMessages = [...prevMessages];
-        updatedMessages.at(chatIndex).content.unshift(newMessage);
+        updatedMessages.at(lastChat.chatIndex).content.unshift(newMessage);
         return updatedMessages;
       });
     } catch (error) {
@@ -147,7 +170,10 @@ function ChatbotChatting({ userID, chats, setChats, chatTitle, setChatTitle, cha
     const dateTime = now.toString().replace(" G", ".").split(".")[0];
 
     const userMessage = { name: "User", message: inputMessage, start: false };
-    setListMessages((prevMessages) => [userMessage, ...prevMessages]);
+    setLastChat((prevChat) => ({
+      ...prevChat,
+      messages: [userMessage, ...prevChat.messages],
+    }));
     addMessage(userMessage);
 
     setInputMessage("");
@@ -171,7 +197,10 @@ function ChatbotChatting({ userID, chats, setChats, chatTitle, setChatTitle, cha
       const botMessage = { name: "Chatbot", message: response.data.response, start: false };
 
       // Add bot response and stop typing animation
-      setListMessages((prevMessages) => [botMessage, ...prevMessages]);
+      setLastChat((prevChat) => ({
+        ...prevChat,
+        messages: [botMessage, ...prevChat.messages],
+      }));
       addMessage(botMessage);
     } catch (error) {
       console.error("Error:", error);
@@ -183,7 +212,10 @@ function ChatbotChatting({ userID, chats, setChats, chatTitle, setChatTitle, cha
       };
 
       // Add error message and stop typing animation
-      setListMessages((prevMessages) => [errorMessage, ...prevMessages]);
+      setLastChat((prevChat) => ({
+        ...prevChat,
+        messages: [errorMessage, ...prevChat.messages],
+      }));
       addMessage(errorMessage);
     } finally {
       // Stop typing animation and clear input
@@ -235,7 +267,7 @@ function ChatbotChatting({ userID, chats, setChats, chatTitle, setChatTitle, cha
                 </div>
               </div>
             )}
-            {listMessages.map((msg, index) => (
+            {lastChat.messages.map((msg, index) => (
               <div className="message" key={index}>
                 {msg.name === "Chatbot" && !msg.start ? <img src={assistant} alt="Chat Support" /> : <div></div>}
                 <div className={`messages__item ${msg.name === "Chatbot" ? "messages__item--visitor" : "messages__item--operator"}`}>
@@ -259,7 +291,7 @@ function ChatbotChatting({ userID, chats, setChats, chatTitle, setChatTitle, cha
           </div>
         </div>
       </div>
-      <div className={`input-button-container ${isInputEnabled ? "show-input-button" : ""}`}>
+      <div className={`input-button-container ${lastChat.isInputEnabled ? "show-input-button" : ""}`}>
         <div className="input-button">
           <input
             className="input-message"
