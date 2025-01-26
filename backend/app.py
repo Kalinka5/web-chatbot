@@ -7,17 +7,17 @@ import os
 from dotenv import load_dotenv
 
 from utils.open_ai_assistant import create_thread
-from utils.deepseek import deepseek_answer
+# from utils.deepseek import deepseek_answer
 from utils.open_ai import openai_answer
 from config import get_chats, add_message
 from schemas import Message
 
 load_dotenv()
 
-deepseek_api_key = os.getenv('DEEPSEEK_API_KEY')
+# deepseek_api_key = os.getenv('DEEPSEEK_API_KEY')
 
-client = OpenAI(api_key=deepseek_api_key, base_url="https://api.deepseek.com")
-# client = OpenAI()  # For gpt-4o
+# client = OpenAI(api_key=deepseek_api_key, base_url="https://api.deepseek.com")
+client = OpenAI()  # For gpt-4o-mini
 app = FastAPI()
 
 # Add CORS middleware
@@ -79,7 +79,7 @@ async def predict(request: Request):
         if not user_question:
             raise HTTPException(status_code=400, detail="No question provided")
 
-        response_message = deepseek_answer(
+        response_message = openai_answer(
             client,
             'static/data_new_domain.txt',
             user_question,

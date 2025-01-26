@@ -17,7 +17,7 @@ def openai_answer(client, file_name, question, datetime=""):
     for chunk in chunks:
         prompt = f"{chunk}\n\nDatetime: {datetime}\n\nQuestion: {question}"
         completion = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system",
                  "content": (

@@ -1,8 +1,13 @@
-from utils.scraplib import Scraplib
+from openai import OpenAI
+
+from utils.open_ai import openai_answer
+
+client = OpenAI()  # For gpt-4o
 
 
-scraplib = Scraplib('https://kaiduweb.ctwiii.com/')
-urls = scraplib.urls_sitemap()
-scraplib.save_urls_to_file(urls, 'urls_new_domain.txt')
-data = scraplib.scrap_all_pages('urls_new_domain.txt')
-scraplib.save_data_to_file(data, 'data_new_domain.txt')
+answer = openai_answer(
+    client,
+    'static/data_new_domain.txt',
+    "When do you open?"
+)
+print(answer)

@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
 
-import ReactMarkdown from "react-markdown";
-
-import assistant from "../images/assistant.png";
+import TyppingLoader from "./home/typping";
+import MessageContainer from "./home/messageContainer";
+import Message from "./home/message";
+import NotificationMessage from "./home/notificationMessage";
+import LastChatsMessage from "./home/lastChatsMessage";
+import SendMessage from "./home/sendMessage";
 
 import api from "../api";
 
-function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSessionPrompt, setIsSessionPrompt }) {
+function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSessionPrompt, setIsSessionPrompt, isChatEnded, setIsChatEnded }) {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isLastChatsVisible, setIsLastChatsVisible] = useState(false);
 
   useEffect(() => {
     // Clear session prompt state on reload
@@ -49,21 +53,9 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
     };
   }, []); // Dependency array ensures it runs only on mount
 
-  const handlePreviousSession = () => {
-    sessionStorage.setItem("hasSessionPrompt", "true");
-    setIsSessionPrompt(false); // Hide session prompt
-    setLastChat((prevChat) => ({
-      ...prevChat,
-      isInputEnabled: true,
-    }));
-    if (chats.length > 0) {
-      setLastChat((prevChat) => ({
-        ...prevChat,
-        messages: chats.at(lastChat.chatIndex).content, // Load previous chat
-      }));
-    }
-    // Display a welcome message
-    displayAnimatedMessage("Hi there! 🌟 Welcome to our chat! How can I assist you today? 🚀");
+  const handlePreviousChats = () => {
+    setIsSessionPrompt(false);
+    setIsLastChatsVisible(true); // Show last chats section
   };
 
   const handleNewChat = () => {
@@ -81,6 +73,7 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
 
     setChats((prevMessages) => [...prevMessages, { title: title, content: [] }]);
     setIsSessionPrompt(false); // Hide session prompt
+    setIsChatEnded(false);
 
     // Display a welcome message
     displayAnimatedMessage(
@@ -88,6 +81,20 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
         "I can help you with questions, guide you through our features, or assist with anything else you need. 💡\n\n" +
         "Go ahead, ask me anything! 🤔"
     );
+  };
+
+  const handleChooseChat = (chatTitle, chatIndex) => {
+    sessionStorage.setItem("hasSessionPrompt", "true");
+    setIsLastChatsVisible(false);
+    setLastChat((prevChat) => ({
+      ...prevChat,
+      chatTitle: chatTitle,
+      chatIndex: chatIndex,
+      isInputEnabled: true,
+      messages: chats.at(chatIndex).content, // Load previous chat
+    }));
+    // Display a welcome message
+    displayAnimatedMessage("Hi there! 🌟 Welcome to our chat! How can I assist you today? 🚀");
   };
 
   const displayAnimatedMessage = (fullMessage) => {
@@ -123,12 +130,6 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
         clearInterval(interval); // Stop the interval when the full message is typed
       }
     }, 50); // Adjust typing speed as needed
-  };
-
-  const handleKeyPress = (event) => {
-    if (event.key === "Enter") {
-      handleSendMessage();
-    }
   };
 
   const addMessage = async (newMessage) => {
@@ -169,7 +170,7 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
     const now = new Date();
     const dateTime = now.toString().replace(" G", ".").split(".")[0];
 
-    const userMessage = { name: "User", message: inputMessage, start: false };
+    const userMessage = { name: "User", message: inputMessage };
     setLastChat((prevChat) => ({
       ...prevChat,
       messages: [userMessage, ...prevChat.messages],
@@ -194,9 +195,9 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
           },
         }
       );
-      const botMessage = { name: "Chatbot", message: response.data.response, start: false };
+      const botMessage = { name: "Chatbot", message: response.data.response };
 
-      // Add bot response and stop typing animation
+      // Add bot response
       setLastChat((prevChat) => ({
         ...prevChat,
         messages: [botMessage, ...prevChat.messages],
@@ -208,17 +209,16 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
       const errorMessage = {
         name: "Chatbot",
         message: "Oops! 🤖 I'm still a baby bot, learning to chat like a pro! 🍼💻 Could you try rephrasing your question for me? 🚀✨",
-        start: false,
       };
 
-      // Add error message and stop typing animation
+      // Add error message
       setLastChat((prevChat) => ({
         ...prevChat,
         messages: [errorMessage, ...prevChat.messages],
       }));
       addMessage(errorMessage);
     } finally {
-      // Stop typing animation and clear input
+      // Stop typing animation
       setIsTyping(false);
     }
   };
@@ -228,84 +228,52 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
       <div className="gif-container">
         <div className="messages-container">
           <div className="chatbox__messages">
+            {/* Show line of ended chat */}
+            {isChatEnded && <div className="chat-ended-message">The chat has ended</div>}
+
+            {/* Loading typping */}
             {isTyping && (
-              <div className="message">
-                <img src={assistant} alt="Chat Support" />
-                <div className="messages__item messages__item--visitor">
-                  <div className="is-typing">
-                    <div className="jump1"></div>
-                    <div className="jump2"></div>
-                    <div className="jump3"></div>
-                    <div className="jump4"></div>
-                    <div className="jump5"></div>
-                  </div>
-                </div>
-              </div>
+              <MessageContainer name="Chatbot">
+                <TyppingLoader />
+              </MessageContainer>
             )}
-            {isSessionPrompt && (
-              <div className="start-message-container">
-                <div className="start-message-card">
-                  <p className="start-message-text">
-                    Do you want to continue with your <b>previous session</b> or <b>start a new chat</b>? ⬇️
-                  </p>
-                  <div className="session-buttons">
-                    {chats.length === 0 ? (
-                      <button className="button new-chat" onClick={handleNewChat}>
-                        New Chat
-                      </button>
-                    ) : (
-                      <>
-                        <button className="button" onClick={handlePreviousSession}>
-                          Previous Session
-                        </button>
-                        <button className="button" onClick={handleNewChat}>
-                          New Chat
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
+
+            {/* Show notification each rerender of component (Previous chats or new chat) */}
+            {!isChatEnded && isSessionPrompt && <NotificationMessage chats={chats} handleNewChat={handleNewChat} handlePreviousChats={handlePreviousChats} />}
+
+            {/* Last Chats Section */}
+            {isLastChatsVisible && (
+              <LastChatsMessage
+                chats={chats}
+                setIsLastChatsVisible={setIsLastChatsVisible}
+                setIsSessionPrompt={setIsSessionPrompt}
+                handleChooseChat={handleChooseChat}
+              />
             )}
-            {lastChat.messages.map((msg, index) => (
-              <div className="message" key={index}>
-                {msg.name === "Chatbot" && !msg.start ? <img src={assistant} alt="Chat Support" /> : <div></div>}
-                <div className={`messages__item ${msg.name === "Chatbot" ? "messages__item--visitor" : "messages__item--operator"}`}>
-                  {typeof msg.message === "string" ? (
-                    msg.message.includes("\n") ? (
-                      msg.message.split("\n").map((msgContent, i) => (
-                        <div className="message-list" key={i}>
-                          <ReactMarkdown>{msgContent}</ReactMarkdown>
-                          {i !== msg.message.split("\n").length - 1 && <p style={{ margin: "16px 0" }}></p>}
-                        </div>
-                      ))
-                    ) : (
-                      <div className="message-list">
-                        <ReactMarkdown>{msg.message}</ReactMarkdown>
-                      </div>
-                    )
-                  ) : null}
-                </div>
-              </div>
-            ))}
+
+            {/* List of all messages */}
+            {!isSessionPrompt &&
+              !isLastChatsVisible &&
+              lastChat.messages.map((msg, index) => (
+                <MessageContainer name={msg.name} key={index}>
+                  <Message message={msg.message} />
+                </MessageContainer>
+              ))}
           </div>
         </div>
       </div>
-      <div className={`input-button-container ${lastChat.isInputEnabled ? "show-input-button" : ""}`}>
-        <div className="input-button">
-          <input
-            className="input-message"
-            type="text"
-            placeholder="Write a message..."
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyUp={handleKeyPress}
-          />
-          <button className="send__button" onClick={handleSendMessage}>
-            Send
+      {/* Input field and Send message button */}
+      {lastChat.isInputEnabled && (
+        <SendMessage lastChat={lastChat} inputMessage={inputMessage} setInputMessage={setInputMessage} handleSendMessage={handleSendMessage} />
+      )}
+      {/* Display "Start new chat" button */}
+      {isChatEnded && (
+        <div className="start-chat-container">
+          <button className="start-chat-button" onClick={handleNewChat}>
+            Start new chat
           </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }

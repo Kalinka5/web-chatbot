@@ -39,6 +39,8 @@ function App() {
   const [numChatsToShow, setNumChatsToShow] = useState(5); // Default to 5 chats
   // Control reloading page (Previous session or new chat)
   const [isSessionPrompt, setIsSessionPrompt] = useState(false);
+  // Message that chat was ended
+  const [isChatEnded, setIsChatEnded] = useState(false);
 
   const [lastChat, setLastChat] = useState({
     chatTitle: null,
@@ -79,15 +81,11 @@ function App() {
   };
 
   const endChat = () => {
-    console.log("Ending Chat...");
-    setLastChat(() => ({
-      chatTitle: null,
-      chatIndex: -1,
-      messages: [],
+    setLastChat((previous) => ({
+      ...previous,
       isInputEnabled: false,
     }));
-    sessionStorage.removeItem("hasSessionPrompt"); // Reset session prompt
-    setIsSessionPrompt(true); // Show session prompt
+    setIsChatEnded(true); // Show ended message
     setIsEndChatModalOpen(false); // Close modal
     setActivePage("home");
   };
@@ -127,6 +125,8 @@ function App() {
             setLastChat={setLastChat}
             isSessionPrompt={isSessionPrompt}
             setIsSessionPrompt={setIsSessionPrompt}
+            isChatEnded={isChatEnded}
+            setIsChatEnded={setIsChatEnded}
           />
         )}
         {activePage === "chats" && (
