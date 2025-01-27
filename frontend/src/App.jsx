@@ -111,35 +111,37 @@ function App() {
 
   return (
     <div className={`chatbox ${isVisible ? "visible" : ""}`}>
-      <div className={`chatbox__support ${isChatboxActive ? "chatbox--active" : ""}`}>
+      <div className={`chatbox__support ${isChatboxActive ? "active" : ""}`}>
         {/* Header */}
         <ChatbotHeader onClick={toggleChatbox} isModalOpen={isEndChatModalOpen} setIsModalOpen={setIsEndChatModalOpen} />
 
         {/* Main Part */}
-        {activePage === "home" && isVisible && (
-          <ChatbotChatting
-            userID={userID}
-            chats={chats}
-            setChats={setChats}
-            lastChat={lastChat}
-            setLastChat={setLastChat}
-            isSessionPrompt={isSessionPrompt}
-            setIsSessionPrompt={setIsSessionPrompt}
-            isChatEnded={isChatEnded}
-            setIsChatEnded={setIsChatEnded}
-          />
-        )}
-        {activePage === "chats" && (
-          <ChatbotPrevChats
-            chats={chats}
-            setLastChat={setLastChat}
-            setActivePage={setActivePage}
-            numChatsToShow={numChatsToShow}
-            setNumChatsToShow={setNumChatsToShow}
-            setIsSessionPrompt={setIsSessionPrompt}
-          />
-        )}
-        {activePage === "help" && <ChatbotHelp />}
+        <div className="main-container">
+          {activePage === "home" && isVisible && (
+            <ChatbotChatting
+              userID={userID}
+              chats={chats}
+              setChats={setChats}
+              lastChat={lastChat}
+              setLastChat={setLastChat}
+              isSessionPrompt={isSessionPrompt}
+              setIsSessionPrompt={setIsSessionPrompt}
+              isChatEnded={isChatEnded}
+              setIsChatEnded={setIsChatEnded}
+            />
+          )}
+          {activePage === "chats" && (
+            <ChatbotPrevChats
+              chats={chats}
+              setLastChat={setLastChat}
+              setActivePage={setActivePage}
+              numChatsToShow={numChatsToShow}
+              setNumChatsToShow={setNumChatsToShow}
+              setIsSessionPrompt={setIsSessionPrompt}
+            />
+          )}
+          {activePage === "help" && <ChatbotHelp />}
+        </div>
 
         {/* Navigation Bar */}
         <ChatbotNavbar activePage={activePage} setActivePage={setActivePage} />

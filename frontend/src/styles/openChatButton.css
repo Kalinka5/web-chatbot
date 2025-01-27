@@ -1,0 +1,31 @@
+/* OPEN/CLOSE CHAT BUTTON */
+.chatbox .chatbox__button {
+  text-align: right;
+
+  .open-chat-button {
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    transition: transform 0.2s ease-in-out; /* Smooth animation */
+    background: var(--primary);
+
+    &:hover {
+      transform: scale(1.1); /* Makes the button 20% larger */
+    }
+    &:active {
+      transform: scale(0.9); /* Shrinks the button to 90% of its size */
+    }
+  }
+  .open-chat-button,
+  .open-chat-button:focus,
+  .open-chat-button:visited {
+    padding: 10px;
+    border: none;
+    outline: none;
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
+    border-bottom-left-radius: 50px;
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+  }
+}

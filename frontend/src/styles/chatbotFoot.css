@@ -1,0 +1,17 @@
+/* FOOTER */
+.chatbox .chatbox__support .chatbox__footer {
+  position: sticky;
+  bottom: 0;
+  padding: 10px;
+  background: var(--secondaryGradient);
+  box-shadow: var(--secondaryBoxShadow);
+
+  .powered {
+    font-size: 12px;
+    text-align: center;
+
+    a {
+      color: var(--primaryText);
+    }
+  }
+}

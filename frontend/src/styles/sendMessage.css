@@ -1,0 +1,53 @@
+/* INPUT-BUTTON */
+.chatbox .chatbox__support .main-container .input-button-container {
+  width: 100%;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  position: sticky; /* Ensure it stays at the bottom of the chat area */
+  overflow: hidden;
+  bottom: 107px;
+  z-index: 10;
+  opacity: 1;
+  backdrop-filter: blur(10px);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 10px;
+
+  .input-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90%;
+
+    .input-message {
+      width: 82%;
+      border: none;
+      padding: 10px;
+      border-radius: 30px;
+      text-align: left;
+      background-color: var(--secondary);
+      color: var(--primaryText);
+
+      &::placeholder {
+        color: var(--primaryText); /* Placeholder text color */
+        opacity: 1; /* Ensure full opacity */
+      }
+    }
+    .send__button {
+      color: var(--secondary);
+      padding: 8px;
+      background: transparent;
+      border: var(--secondary) 2px solid;
+      border-radius: 30px;
+      outline: none;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--secondary);
+        color: var(--primaryText);
+      }
+    }
+  }
+}

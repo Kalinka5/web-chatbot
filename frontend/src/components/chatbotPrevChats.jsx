@@ -2,6 +2,8 @@ import React from "react";
 
 import ChatbotImg from "../images/chatbot.png";
 
+import "../styles/chatbotPrevChats.css";
+
 function ChatbotPrevChats({ chats, setLastChat, setActivePage, numChatsToShow, setNumChatsToShow, setIsSessionPrompt }) {
   const handleChooseChat = (chatTitle, chatIndex) => {
     sessionStorage.setItem("hasSessionPrompt", "true");
@@ -20,7 +22,7 @@ function ChatbotPrevChats({ chats, setLastChat, setActivePage, numChatsToShow, s
   };
 
   return (
-    <div className="main-container">
+    <>
       <div className="chat-display-options">
         <p className="options-label">How many chats do you want to display?</p>
         <div className="radio-buttons">
@@ -60,7 +62,7 @@ function ChatbotPrevChats({ chats, setLastChat, setActivePage, numChatsToShow, s
           </div>
         ))
       )}
-    </div>
+    </>
   );
 }
 

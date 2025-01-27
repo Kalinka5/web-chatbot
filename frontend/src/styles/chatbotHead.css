@@ -1,0 +1,48 @@
+/* HEADER */
+.chatbox .chatbox__support .chatbox__header {
+  position: sticky;
+  top: 0;
+  height: 60px;
+  background: var(--primaryGradient);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 10px;
+  box-shadow: var(--primaryBoxShadow);
+
+  .img-name {
+    display: flex;
+    align-items: center;
+
+    .chatbox__image {
+      margin-right: 10px;
+      height: 100%;
+      display: flex;
+
+      img {
+        height: 32px;
+        width: 32px;
+        border-radius: 50%;
+      }
+    }
+    .chatbox__heading {
+      font-size: 1.2rem;
+      color: var(--primaryText);
+    }
+  }
+  .nav-buttons {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    .nav-button {
+      cursor: pointer;
+    }
+    .block {
+      display: block;
+    }
+    .dots {
+      transform: rotate(90deg);
+    }
+  }
+}

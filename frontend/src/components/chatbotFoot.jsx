@@ -1,5 +1,7 @@
 import React from "react";
 
+import "../styles/chatbotFoot.css";
+
 function ChatbotFooter({ poweredBy }) {
   return (
     <div className="chatbox__footer">

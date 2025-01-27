@@ -6,8 +6,11 @@ import Message from "./home/message";
 import NotificationMessage from "./home/notificationMessage";
 import LastChatsMessage from "./home/lastChatsMessage";
 import SendMessage from "./home/sendMessage";
+import StartChatButton from "./home/startChatButton";
 
 import api from "../api";
+
+import "../styles/chatbotChatting.css";
 
 function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSessionPrompt, setIsSessionPrompt, isChatEnded, setIsChatEnded }) {
   const [inputMessage, setInputMessage] = useState("");
@@ -71,6 +74,7 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
       isInputEnabled: true,
     }));
 
+    sessionStorage.setItem("hasSessionPrompt", "true");
     setChats((prevMessages) => [...prevMessages, { title: title, content: [] }]);
     setIsSessionPrompt(false); // Hide session prompt
     setIsChatEnded(false);
@@ -98,38 +102,37 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
   };
 
   const displayAnimatedMessage = (fullMessage) => {
-    let currentMessage = "";
-    let index = 0;
+    let currentMessage = ""; // Tracks the currently typed message
+    let index = 0; // Tracks the current character being typed
 
-    // Insert a placeholder for the animated starting message at the top
+    // Insert a new placeholder message for the animated typing effect
     setLastChat((prevChat) => ({
       ...prevChat,
-      messages: [...prevChat.messages, { name: "Chatbot", message: "" }],
+      messages: [...prevChat.messages, { name: "Chatbot", message: "" }], // Add a new empty message for typing
     }));
 
+    // Start the typing animation
     const interval = setInterval(() => {
       if (index < fullMessage.length) {
-        currentMessage += fullMessage[index];
+        currentMessage += fullMessage[index]; // Add the next character
         setLastChat((prevChat) => {
-          // Create a shallow copy of the existing messages array
+          // Append the typing effect to the most recent message without replacing other messages
           const updatedMessages = [...prevChat.messages];
-          // Update the last message in the array
           updatedMessages[updatedMessages.length - 1] = {
-            name: "Chatbot",
-            message: currentMessage,
+            ...updatedMessages[updatedMessages.length - 1], // Preserve message metadata
+            message: currentMessage, // Update only the message content
           };
 
-          // Return the updated chat object
           return {
-            ...prevChat, // Preserve other properties of the chat object
-            messages: updatedMessages, // Update the messages property
+            ...prevChat, // Preserve other chat properties
+            messages: updatedMessages, // Update the messages array
           };
         });
         index++;
       } else {
-        clearInterval(interval); // Stop the interval when the full message is typed
+        clearInterval(interval); // Stop the typing animation when done
       }
-    }, 50); // Adjust typing speed as needed
+    }, 50); // Adjust the typing speed as needed
   };
 
   const addMessage = async (newMessage) => {
@@ -224,7 +227,7 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
   };
 
   return (
-    <div className="main-container">
+    <>
       <div className="gif-container">
         <div className="messages-container">
           <div className="chatbox__messages">
@@ -267,14 +270,8 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
         <SendMessage lastChat={lastChat} inputMessage={inputMessage} setInputMessage={setInputMessage} handleSendMessage={handleSendMessage} />
       )}
       {/* Display "Start new chat" button */}
-      {isChatEnded && (
-        <div className="start-chat-container">
-          <button className="start-chat-button" onClick={handleNewChat}>
-            Start new chat
-          </button>
-        </div>
-      )}
-    </div>
+      {isChatEnded && <StartChatButton onClick={handleNewChat} />}
+    </>
   );
 }
 

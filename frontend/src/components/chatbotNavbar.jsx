@@ -4,6 +4,8 @@ import { IoIosHome } from "react-icons/io";
 import { TbMessages } from "react-icons/tb";
 import { IoIosHelpCircleOutline } from "react-icons/io";
 
+import "../styles/chatbotNavbar.css";
+
 function ChatbotNavbar({ activePage, setActivePage }) {
   return (
     <div className="navbar">

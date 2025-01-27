@@ -1,5 +1,7 @@
 import React from "react";
 
+import "../../styles/sendMessage.css";
+
 function SendMessage({ lastChat, inputMessage, setInputMessage, handleSendMessage }) {
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {

@@ -1,11 +1,11 @@
 import React from "react";
 
+import "../styles/chatbotPrevChats.css";
+
 function ChatbotHelp() {
   return (
-    <div className="main-container">
-      <div className="no-msgs-container">
-        <p className="no-messages">We will add functionality later...</p>
-      </div>
+    <div className="no-msgs-container">
+      <p className="no-messages">We will add functionality later...</p>
     </div>
   );
 }

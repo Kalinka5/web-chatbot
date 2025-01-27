@@ -2,6 +2,8 @@ import React from "react";
 
 import assistant from "../images/assistant.png";
 
+import "../styles/chatbotHead.css";
+
 function ChatbotHeader({ onClick, isModalOpen, setIsModalOpen }) {
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -10,10 +12,10 @@ function ChatbotHeader({ onClick, isModalOpen, setIsModalOpen }) {
   return (
     <div className="chatbox__header">
       <div className="img-name">
-        <div className="chatbox__image--header">
+        <div className="chatbox__image">
           <img src={assistant} alt="Chat Support" />
         </div>
-        <h4 className="chatbox__heading--header">AI Assistant</h4>
+        <h4 className="chatbox__heading">AI Assistant</h4>
       </div>
       <div className="nav-buttons">
         <div className="block">
