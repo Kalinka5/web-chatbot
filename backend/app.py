@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from utils.open_ai_assistant import create_thread
 # from utils.deepseek import deepseek_answer
 from utils.open_ai import openai_answer
-from config import get_chats, add_message
+from config import get_chats, add_message, delete_all_chats, delete_chat
 from schemas import Message
 
 load_dotenv()
@@ -112,3 +112,29 @@ async def write_user_message(session_id: str, message: Message):
     """
     add_message(session_id, message)
     return {"detail": "Message added successfully."}
+
+
+@app.delete("/chats/{session_id}")
+async def delete_user_all_chats(session_id: str):
+    """
+    Delete all chats from the user's session.
+    """
+    user_data = delete_all_chats(session_id)
+    print(user_data)
+    if user_data:
+        return {"detail": "All chats deleted successfully.", "ok": True}
+    else:
+        raise HTTPException(status_code=404, detail="Session not found.")
+
+
+@app.delete("/chats/{session_id}/{chat_title}")
+async def delete_user_chat(session_id: str, chat_title: str):
+    """
+    Delete a chat from the user's session.
+    """
+    chat_deleted = delete_chat(session_id, chat_title)
+    print(chat_deleted)
+    if chat_deleted:
+        return {"detail": "Chat deleted successfully.", "ok": True}
+    else:
+        raise HTTPException(status_code=404, detail="Chat not found.")

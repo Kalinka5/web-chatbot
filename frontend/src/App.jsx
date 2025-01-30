@@ -11,6 +11,8 @@ import ChatModal from "./components/ChatModal";
 import OpenChatButton from "./components/openChatButton";
 
 import getSessionId from "./utils/sessionID";
+import displayAnimatedMessage from "./utils/animatedMessage";
+
 import api from "./api";
 
 import "./App.css";
@@ -36,7 +38,6 @@ function App() {
 
   const [activePage, setActivePage] = useState("home"); // Main page
   const [chats, setChats] = useState([]);
-  const [numChatsToShow, setNumChatsToShow] = useState(5); // Default to 5 chats
   // Control reloading page (Previous session or new chat)
   const [isSessionPrompt, setIsSessionPrompt] = useState(false);
   // Message that chat was ended
@@ -63,21 +64,31 @@ function App() {
     if (userID) {
       getChats().then((data) => {
         if (data) {
-          setChats(data.slice(-numChatsToShow, data.length));
+          setChats(data);
         }
         setIsVisible(true);
       });
     }
-  }, [userID, numChatsToShow]);
+  }, [userID]);
 
   const toggleChatbox = () => {
     setIsChatboxActive(!isChatboxActive); // Trigger open animation
   };
 
-  const clearChats = () => {
-    localStorage.removeItem("chatbot_session_id"); // Clear the session ID
-    setChats([]);
-    setIsDeleteChatsOpen(!isDeleteChatsOpen);
+  const clearChats = async () => {
+    try {
+      const response = await api.delete(`/chats/${userID}`);
+
+      if (response.data.ok) {
+        console.log("All chats deleted successfully.");
+        setChats([]); // Clear all chats
+        setIsDeleteChatsOpen(false); // Close the modal
+      } else {
+        console.log("Failed to delete chats.");
+      }
+    } catch (error) {
+      console.error("Error deleting chats:", error);
+    }
   };
 
   const endChat = () => {
@@ -109,6 +120,35 @@ function App() {
     }
   };
 
+  const handleNewChat = () => {
+    // Start a new chat session
+    const now = new Date();
+    const formattedDate = now.toString().replace(" G", ".").split(".")[0]; // Format as "YYYY-MM-DD HH:MM:SS"
+    const title = `Chat ${formattedDate}`;
+
+    setLastChat(() => ({
+      chatTitle: title,
+      chatIndex: 0,
+      messages: [],
+      isInputEnabled: true,
+    }));
+
+    sessionStorage.setItem("hasSessionPrompt", "true");
+    setChats((prevMessages) => [{ title: title, content: [] }, ...prevMessages]);
+    setIsSessionPrompt(false); // Hide session prompt
+    setIsChatEnded(false);
+    setActivePage("home");
+
+    // Display a welcome message
+    displayAnimatedMessage({
+      fullMessage:
+        "Hello! 👋 I'm your virtual assistant, here to make things easier for you. 🧠\n\n" +
+        "I can help you with questions, guide you through our features, or assist with anything else you need. 💡\n\n" +
+        "Go ahead, ask me anything! 🤔",
+      setLastChat,
+    });
+  };
+
   return (
     <div className={`chatbox ${isVisible ? "visible" : ""}`}>
       <div className={`chatbox__support ${isChatboxActive ? "active" : ""}`}>
@@ -128,16 +168,19 @@ function App() {
               setIsSessionPrompt={setIsSessionPrompt}
               isChatEnded={isChatEnded}
               setIsChatEnded={setIsChatEnded}
+              handleNewChat={handleNewChat}
             />
           )}
           {activePage === "chats" && (
             <ChatbotPrevChats
               chats={chats}
+              setChats={setChats}
               setLastChat={setLastChat}
               setActivePage={setActivePage}
-              numChatsToShow={numChatsToShow}
-              setNumChatsToShow={setNumChatsToShow}
               setIsSessionPrompt={setIsSessionPrompt}
+              handleNewChat={handleNewChat}
+              userID={userID}
+              setIsDeleteChatsOpen={setIsDeleteChatsOpen}
             />
           )}
           {activePage === "help" && <ChatbotHelp />}
@@ -163,7 +206,7 @@ function App() {
           setIsModalOpen={setIsDeleteChatsOpen}
           onClick={clearChats}
           headText="Delete Chat History"
-          question="Are you sure you want to delete all chat history?"
+          question="Are you sure want to delete all chat history?"
           buttonText="Delete history"
         />
       </div>

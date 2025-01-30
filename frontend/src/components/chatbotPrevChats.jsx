@@ -1,10 +1,35 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdDeleteOutline } from "react-icons/md";
 
 import ChatbotImg from "../images/chatbot.png";
 
+import api from "../api";
+
 import "../styles/chatbotPrevChats.css";
 
-function ChatbotPrevChats({ chats, setLastChat, setActivePage, numChatsToShow, setNumChatsToShow, setIsSessionPrompt }) {
+function ChatbotPrevChats({ chats, setChats, setLastChat, setActivePage, setIsSessionPrompt, handleNewChat, userID, setIsDeleteChatsOpen }) {
+  const [pageNumber, setPageNumber] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const itemsPerPage = 5; // Display 5 chats per pag
+
+  useEffect(() => {
+    setTotalPages(Math.ceil(chats.length / itemsPerPage));
+  }, [chats]);
+
+  // Get only the 5 chats for the current page
+  const startIndex = (pageNumber - 1) * itemsPerPage;
+  const paginatedChats = chats.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePrevPage = () => {
+    if (pageNumber > 1) setPageNumber(pageNumber - 1);
+  };
+
+  const handleNextPage = () => {
+    if (pageNumber < totalPages) setPageNumber(pageNumber + 1);
+  };
+
   const handleChooseChat = (chatTitle, chatIndex) => {
     sessionStorage.setItem("hasSessionPrompt", "true");
     setIsSessionPrompt(false);
@@ -17,51 +42,95 @@ function ChatbotPrevChats({ chats, setLastChat, setActivePage, numChatsToShow, s
     setActivePage("home");
   };
 
-  const handleRadioChange = (event) => {
-    setNumChatsToShow(Number(event.target.value)); // Update the number of chats to show
+  const handleDeleteChat = async (chatTitle) => {
+    const confirmDelete = window.confirm(`Are you sure you want to delete "${chatTitle}"?`);
+
+    if (!confirmDelete) return;
+
+    try {
+      const response = await api.delete(`/chats/${userID}/${encodeURIComponent(chatTitle)}`);
+
+      if (response.data.ok) {
+        console.log(`Chat "${chatTitle}" deleted successfully.`);
+        setChats((prevChats) => prevChats.filter((chat) => chat.title !== chatTitle)); // Remove from state
+
+        // If deleting the last item on the page, move to previous page
+        if (paginatedChats.length === 1 && pageNumber > 1) {
+          setPageNumber(pageNumber - 1);
+        }
+      } else {
+        console.log("Failed to delete chat.");
+      }
+    } catch (error) {
+      console.error("Error deleting chat:", error);
+    }
+  };
+
+  const DeleteAllChats = () => {
+    setIsDeleteChatsOpen(true);
   };
 
   return (
     <>
       <div className="chat-display-options">
-        <p className="options-label">How many chats do you want to display?</p>
-        <div className="radio-buttons">
-          <label>
-            <input type="radio" name="numChats" value="3" checked={numChatsToShow === 3} onChange={handleRadioChange} />
-            <b>3</b>
-          </label>
-          <label>
-            <input type="radio" name="numChats" value="5" checked={numChatsToShow === 5} onChange={handleRadioChange} />
-            <b>5</b>
-          </label>
-          <label>
-            <input type="radio" name="numChats" value="7" checked={numChatsToShow === 7} onChange={handleRadioChange} />
-            <b>7</b>
-          </label>
+        <div className="title-container">
+          <span className="chat-display-title">Previous Chats</span>
+        </div>
+        <div className="buttons-container">
+          <button className="chat-button new-chat" onClick={handleNewChat}>
+            +
+          </button>
+          <button className="chat-button delete-chats" onClick={DeleteAllChats} disabled={chats.length === 0}>
+            <MdDeleteOutline />
+          </button>
         </div>
       </div>
       {chats.length === 0 ? (
-        <div className="no-msgs-container">
-          <p className="no-messages">No messages yet...</p>
+        <div className="chats-container no-msgs-container">
+          <p className="no-messages">No chats yet...</p>
         </div>
       ) : (
-        chats.map((chat, index) => (
-          <div key={index} className="chat-item" onClick={() => handleChooseChat(chat.title, index)}>
-            <div className="message-name">
-              <img className="chatbot-img" src={ChatbotImg} alt="Chatbot"></img>
-              {chat.title}
+        <div className="chats-container">
+          {paginatedChats.map((chat, index) => (
+            <div key={index} className="chat-item">
+              <div className="message-name" onClick={() => handleChooseChat(chat.title, index)}>
+                <img className="chatbot-img" src={ChatbotImg} alt="Chatbot" />
+                {chat.title}
+              </div>
+
+              <div className="chat-actions">
+                {/* Delete Button */}
+                <button className="delete-chat-button" onClick={() => handleDeleteChat(chat.title)}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M6 2V1H10V2H13V3H3V2H6ZM4 4V14C4 14.55 4.45 15 5 15H11C11.55 15 12 14.55 12 14V4H4Z" fill="currentColor" />
+                  </svg>
+                </button>
+
+                {/* Right Arrow */}
+                <div className="right-arrow" onClick={() => handleChooseChat(chat.title, index)}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path
+                      d="M5.42773 4.70898C5.46387 4.85254 5.53809 4.98828 5.65039 5.10059L8.54932 8L5.64893 10.9004C5.31689 11.2324 5.31689 11.7705 5.64893 12.1025C5.98096 12.4336 6.51904 12.4336 6.85107 12.1025L10.3516 8.60059C10.5591 8.39355 10.6367 8.10449 10.585 7.83691C10.5537 7.67578 10.4761 7.52246 10.3516 7.39844L6.85254 3.89941C6.52051 3.56738 5.98242 3.56738 5.65039 3.89941C5.43066 4.11816 5.35645 4.42871 5.42773 4.70898Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </div>
+              </div>
             </div>
-            <div className="right-arrow">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M5.42773 4.70898C5.46387 4.85254 5.53809 4.98828 5.65039 5.10059L8.54932 8L5.64893 10.9004C5.31689 11.2324 5.31689 11.7705 5.64893 12.1025C5.98096 12.4336 6.51904 12.4336 6.85107 12.1025L10.3516 8.60059C10.5591 8.39355 10.6367 8.10449 10.585 7.83691C10.5537 7.67578 10.4761 7.52246 10.3516 7.39844L6.85254 3.89941C6.52051 3.56738 5.98242 3.56738 5.65039 3.89941C5.43066 4.11816 5.35645 4.42871 5.42773 4.70898Z"
-                  fill="currentColor"
-                ></path>
-              </svg>
-            </div>
-          </div>
-        ))
+          ))}
+        </div>
       )}
+
+      {/* Pagination */}
+      <div className="chats-pagination">
+        <button className="pagination-button prev-page" onClick={handlePrevPage} disabled={pageNumber === 1}>
+          <MdKeyboardArrowLeft />
+        </button>
+        <span className="page-number">{pageNumber}</span>
+        <button className="pagination-button next-page" onClick={handleNextPage} disabled={pageNumber >= totalPages}>
+          <MdKeyboardArrowRight />
+        </button>
+      </div>
     </>
   );
 }

@@ -10,9 +10,11 @@ import StartChatButton from "./home/startChatButton";
 
 import api from "../api";
 
+import displayAnimatedMessage from "../utils/animatedMessage";
+
 import "../styles/chatbotChatting.css";
 
-function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSessionPrompt, setIsSessionPrompt, isChatEnded, setIsChatEnded }) {
+function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSessionPrompt, setIsSessionPrompt, isChatEnded, setIsChatEnded, handleNewChat }) {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isLastChatsVisible, setIsLastChatsVisible] = useState(false);
@@ -39,7 +41,10 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
       }
 
       // Display a welcome message
-      displayAnimatedMessage("Hi there! 🌟 Welcome to our chat! How can I assist you today? 🚀");
+      displayAnimatedMessage({
+        fullMessage: "Hi there! 🌟 Welcome to our chat! How can I assist you today? 🚀",
+        setLastChat,
+      });
     } else {
       // First page load or reload: show session prompt
       console.log("Displaying session prompt.");
@@ -61,32 +66,6 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
     setIsLastChatsVisible(true); // Show last chats section
   };
 
-  const handleNewChat = () => {
-    // Start a new chat session
-    const now = new Date();
-    const formattedDate = now.toString().replace(" G", ".").split(".")[0]; // Format as "YYYY-MM-DD HH:MM:SS"
-    const title = `Chat ${formattedDate}`;
-
-    setLastChat(() => ({
-      chatTitle: title,
-      chatIndex: chats.length,
-      messages: [],
-      isInputEnabled: true,
-    }));
-
-    sessionStorage.setItem("hasSessionPrompt", "true");
-    setChats((prevMessages) => [...prevMessages, { title: title, content: [] }]);
-    setIsSessionPrompt(false); // Hide session prompt
-    setIsChatEnded(false);
-
-    // Display a welcome message
-    displayAnimatedMessage(
-      "Hello! 👋 I'm your virtual assistant, here to make things easier for you. 🧠\n\n" +
-        "I can help you with questions, guide you through our features, or assist with anything else you need. 💡\n\n" +
-        "Go ahead, ask me anything! 🤔"
-    );
-  };
-
   const handleChooseChat = (chatTitle, chatIndex) => {
     sessionStorage.setItem("hasSessionPrompt", "true");
     setIsLastChatsVisible(false);
@@ -98,41 +77,10 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
       messages: chats.at(chatIndex).content, // Load previous chat
     }));
     // Display a welcome message
-    displayAnimatedMessage("Hi there! 🌟 Welcome to our chat! How can I assist you today? 🚀");
-  };
-
-  const displayAnimatedMessage = (fullMessage) => {
-    let currentMessage = ""; // Tracks the currently typed message
-    let index = 0; // Tracks the current character being typed
-
-    // Insert a new placeholder message for the animated typing effect
-    setLastChat((prevChat) => ({
-      ...prevChat,
-      messages: [...prevChat.messages, { name: "Chatbot", message: "" }], // Add a new empty message for typing
-    }));
-
-    // Start the typing animation
-    const interval = setInterval(() => {
-      if (index < fullMessage.length) {
-        currentMessage += fullMessage[index]; // Add the next character
-        setLastChat((prevChat) => {
-          // Append the typing effect to the most recent message without replacing other messages
-          const updatedMessages = [...prevChat.messages];
-          updatedMessages[updatedMessages.length - 1] = {
-            ...updatedMessages[updatedMessages.length - 1], // Preserve message metadata
-            message: currentMessage, // Update only the message content
-          };
-
-          return {
-            ...prevChat, // Preserve other chat properties
-            messages: updatedMessages, // Update the messages array
-          };
-        });
-        index++;
-      } else {
-        clearInterval(interval); // Stop the typing animation when done
-      }
-    }, 50); // Adjust the typing speed as needed
+    displayAnimatedMessage({
+      fullMessage: "Hi there! 🌟 Welcome to our chat! How can I assist you today? 🚀",
+      setLastChat,
+    });
   };
 
   const addMessage = async (newMessage) => {

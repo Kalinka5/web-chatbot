@@ -1,36 +1,104 @@
 /* CHATS */
 .chatbox .chatbox__support .main-container .chat-display-options {
-  height: 70px;
+  height: 96px;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-content: center;
-  justify-content: center;
   flex-wrap: wrap;
+  padding: 20px 21px;
+  background-color: #dadada;
 
-  .options-label {
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--secondary);
-  }
-  .radio-buttons {
+  .buttons-container {
     display: flex;
-    justify-content: center;
-    gap: 15px;
+    gap: 12px;
 
-    label {
-      font-size: 14px;
-      cursor: pointer;
-      color: var(--secondary);
+    .delete-chats {
+      background-color: #b90000;
+
+      &:not(:disabled)::after {
+        content: "Delete chats"; /* Tooltip text */
+        left: 30%;
+      }
+      &:not(:disabled):hover {
+        background-color: #a10000;
+      }
+      &:disabled {
+        background-color: #a100005d;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+      }
     }
-    input {
-      margin-right: 5px;
+    .new-chat {
+      background-color: #009732; /* Primary blue */
+
+      &:hover {
+        background-color: #007a29; /* Darker blue */
+      }
+      &::after {
+        content: "Create chat"; /* Tooltip text */
+        left: 50%;
+      }
+    }
+    .chat-button {
+      height: 45px;
+      width: 45px;
+      color: white;
+      border: none;
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px; /* Slightly rounded corners */
       cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      position: relative; /* Needed for tooltip positioning */
+
+      &:not(:disabled):hover {
+        transform: translateY(-2px); /* Lift effect */
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+      &:active {
+        transform: translateY(1px); /* Press effect */
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+      }
+      /* Tooltip Styling */
+      &:not(:disabled)::after {
+        position: absolute;
+        bottom: -35px; /* Position below the button */
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 6px 10px;
+        font-size: 14px;
+        border-radius: 4px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease-in-out;
+      }
+      /* Show tooltip on hover */
+      &:hover::after {
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+  }
+  .title-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .chat-display-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #007bff;
     }
   }
 }
 .chatbox .chatbox__support .main-container .no-msgs-container {
-  height: calc(100% - 70px);
-  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -39,36 +107,113 @@
     color: var(--secondary);
   }
 }
-.chatbox .chatbox__support .main-container .chat-item {
-  padding: 10px 15px;
-  cursor: pointer;
-  background-color: var(--primaryText);
-  color: #11a8ff;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  border-bottom: 1px solid #ddd;
+.chatbox .chatbox__support .main-container .chats-container {
+  height: calc(100% - 96px - 42px);
+  width: 100%;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
 
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.06);
-    color: var(--secondary);
-  }
-  &:last-child {
-    border-bottom: none;
-  }
-  .message-name {
+  .chat-item {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    padding: 15px 16px;
+    cursor: pointer;
+    background-color: var(--primaryText);
+    color: #11a8ff;
+    transition: background-color 0.3s;
+    border-bottom: 1px solid #ddd;
 
-    .chatbot-img {
-      height: 40px;
-      width: 40px;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.06);
+      color: var(--secondary);
+    }
+    &:hover .chat-actions .right-arrow {
+      transform: translateX(4px); /* Move slightly on hover */
+    }
+    &:last-child {
+      border-bottom: none;
+    }
+    .message-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-grow: 1;
+
+      .chatbot-img {
+        height: 40px;
+        width: 40px;
+      }
+    }
+    .chat-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px; /* Space between delete and arrow */
+
+      /* Delete Button */
+      .delete-chat-button {
+        background: none;
+        border: none;
+        color: #dc3545; /* Red delete icon */
+        cursor: pointer;
+        padding: 6px;
+        transition: color 0.3s, transform 0.2s;
+      }
+      .delete-chat-button:hover {
+        color: #b52a37; /* Darker red */
+        transform: scale(1.2); /* Slight zoom */
+      }
+      .right-arrow {
+        cursor: pointer;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        transition: transform 0.2s;
+      }
     }
   }
-  .right-arrow {
-    height: 40px;
+}
+.chatbox .chatbox__support .main-container .chats-pagination {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px; /* Spacing between buttons and number */
+  background-color: #dadada;
+
+  .pagination-button {
+    background-color: #007bff; /* Primary blue */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    width: 42px; /* Fixed width for equal spacing */
+    height: 28px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+
+    &:not(:disabled):hover {
+      background-color: #0056b3; /* Darker blue */
+      transform: translateY(-2px); /* Lift effect */
+    }
+    &:disabled {
+      background-color: #007bff4d;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+  }
+  .page-number {
+    color: #007bff;
+    font-size: 18px;
+    font-weight: bold;
+    min-width: 40px;
+    text-align: center;
   }
 }
