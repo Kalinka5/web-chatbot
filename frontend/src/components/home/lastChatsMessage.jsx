@@ -14,7 +14,7 @@ function LastChatsMessage({ chats, setIsLastChatsVisible, setIsSessionPrompt, ha
             <button
               key={index}
               className="button"
-              onClick={() => handleChooseChat(chat.title, chats.length - 3 + index)} // Adjust index to map correctly
+              onClick={() => handleChooseChat(chat.title, -1 - index)} // Adjust index to map correctly
             >
               {chat.title}
             </button>

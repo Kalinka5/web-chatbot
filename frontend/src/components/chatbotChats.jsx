@@ -4,23 +4,33 @@ import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdDeleteOutline } from "reac
 
 import ChatbotImg from "../images/chatbot.png";
 
+import ModalDeleteChat from "./modalDeleteChat";
+
 import api from "../api";
 
-import "../styles/chatbotPrevChats.css";
+import "../styles/chatbotChats.css";
 
-function ChatbotPrevChats({ chats, setChats, setLastChat, setActivePage, setIsSessionPrompt, handleNewChat, userID, setIsDeleteChatsOpen }) {
+function ChatbotChats({ chats, setChats, setLastChat, setActivePage, setIsSessionPrompt, handleNewChat, userID, setIsDeleteChatsOpen }) {
   const [pageNumber, setPageNumber] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [chatTitle, setChatTitle] = useState("");
+
+  const [isDeleteOneChatOpen, setIsDeleteOneChatOpen] = useState(false);
 
   const itemsPerPage = 5; // Display 5 chats per pag
-
-  useEffect(() => {
-    setTotalPages(Math.ceil(chats.length / itemsPerPage));
-  }, [chats]);
 
   // Get only the 5 chats for the current page
   const startIndex = (pageNumber - 1) * itemsPerPage;
   const paginatedChats = chats.slice(startIndex, startIndex + itemsPerPage);
+
+  useEffect(() => {
+    // Clear session prompt state on reload
+    window.onbeforeunload = () => {
+      sessionStorage.removeItem("hasSessionPrompt");
+    };
+
+    setTotalPages(Math.ceil(chats.length / itemsPerPage));
+  }, [chats]);
 
   const handlePrevPage = () => {
     if (pageNumber > 1) setPageNumber(pageNumber - 1);
@@ -42,17 +52,15 @@ function ChatbotPrevChats({ chats, setChats, setLastChat, setActivePage, setIsSe
     setActivePage("home");
   };
 
-  const handleDeleteChat = async (chatTitle) => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete "${chatTitle}"?`);
-
-    if (!confirmDelete) return;
-
+  const handleDeleteChat = async () => {
     try {
       const response = await api.delete(`/chats/${userID}/${encodeURIComponent(chatTitle)}`);
 
       if (response.data.ok) {
         console.log(`Chat "${chatTitle}" deleted successfully.`);
         setChats((prevChats) => prevChats.filter((chat) => chat.title !== chatTitle)); // Remove from state
+
+        setIsDeleteOneChatOpen(false); // Close the modal
 
         // If deleting the last item on the page, move to previous page
         if (paginatedChats.length === 1 && pageNumber > 1) {
@@ -68,6 +76,11 @@ function ChatbotPrevChats({ chats, setChats, setLastChat, setActivePage, setIsSe
 
   const DeleteAllChats = () => {
     setIsDeleteChatsOpen(true);
+  };
+
+  const DeleteOneChat = (chatTitle) => {
+    setChatTitle(chatTitle);
+    setIsDeleteOneChatOpen(true);
   };
 
   return (
@@ -100,7 +113,7 @@ function ChatbotPrevChats({ chats, setChats, setLastChat, setActivePage, setIsSe
 
               <div className="chat-actions">
                 {/* Delete Button */}
-                <button className="delete-chat-button" onClick={() => handleDeleteChat(chat.title)}>
+                <button className="delete-chat-button" onClick={() => DeleteOneChat(chat.title)}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M6 2V1H10V2H13V3H3V2H6ZM4 4V14C4 14.55 4.45 15 5 15H11C11.55 15 12 14.55 12 14V4H4Z" fill="currentColor" />
                   </svg>
@@ -131,8 +144,21 @@ function ChatbotPrevChats({ chats, setChats, setLastChat, setActivePage, setIsSe
           <MdKeyboardArrowRight />
         </button>
       </div>
+
+      {/* Modals */}
+      <ModalDeleteChat
+        isOpen={isDeleteOneChatOpen}
+        onClose={() => setIsDeleteOneChatOpen(false)}
+        headText="Delete Chat"
+        question={`Are you sure you want to delete`}
+        chatTitle={chatTitle}
+        buttonText="Delete chat"
+        onClick={handleDeleteChat}
+        setIsModalOpen={isDeleteOneChatOpen}
+        isModalOpen={setIsDeleteChatsOpen}
+      />
     </>
   );
 }
 
-export default ChatbotPrevChats;
+export default ChatbotChats;

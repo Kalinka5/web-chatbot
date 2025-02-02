@@ -10,16 +10,15 @@ import StartChatButton from "./home/startChatButton";
 
 import api from "../api";
 
-import displayAnimatedMessage from "../utils/animatedMessage";
+import "../styles/chatbotHome.css";
 
-import "../styles/chatbotChatting.css";
-
-function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSessionPrompt, setIsSessionPrompt, isChatEnded, setIsChatEnded, handleNewChat }) {
+function ChatbotHome({ userID, chats, setChats, lastChat, setLastChat, isSessionPrompt, setIsSessionPrompt, isChatEnded, handleNewChat }) {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isLastChatsVisible, setIsLastChatsVisible] = useState(false);
 
   useEffect(() => {
+    console.log(isSessionPrompt);
     // Clear session prompt state on reload
     window.onbeforeunload = () => {
       sessionStorage.removeItem("hasSessionPrompt");
@@ -41,10 +40,19 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
       }
 
       // Display a welcome message
-      displayAnimatedMessage({
-        fullMessage: "Hi there! 🌟 Welcome to our chat! How can I assist you today? 🚀",
-        setLastChat,
-      });
+      setLastChat((prevChat) => ({
+        ...prevChat,
+        messages: [
+          ...prevChat.messages,
+          {
+            name: "Chatbot",
+            message:
+              "Hello! 👋 I'm your virtual assistant, here to make things easier for you. 🧠\n\n" +
+              "I can help you with questions, guide you through our features, or assist with anything else you need. 💡\n\n" +
+              "Go ahead, ask me anything! 🤔",
+          },
+        ], // Add a new empty message for typing
+      }));
     } else {
       // First page load or reload: show session prompt
       console.log("Displaying session prompt.");
@@ -77,10 +85,19 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
       messages: chats.at(chatIndex).content, // Load previous chat
     }));
     // Display a welcome message
-    displayAnimatedMessage({
-      fullMessage: "Hi there! 🌟 Welcome to our chat! How can I assist you today? 🚀",
-      setLastChat,
-    });
+    setLastChat((prevChat) => ({
+      ...prevChat,
+      messages: [
+        ...prevChat.messages,
+        {
+          name: "Chatbot",
+          message:
+            "Hello! 👋 I'm your virtual assistant, here to make things easier for you. 🧠\n\n" +
+            "I can help you with questions, guide you through our features, or assist with anything else you need. 💡\n\n" +
+            "Go ahead, ask me anything! 🤔",
+        },
+      ], // Add a new empty message for typing
+    }));
   };
 
   const addMessage = async (newMessage) => {
@@ -223,4 +240,4 @@ function ChatbotChatting({ userID, chats, setChats, lastChat, setLastChat, isSes
   );
 }
 
-export default ChatbotChatting;
+export default ChatbotHome;

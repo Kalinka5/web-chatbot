@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 
 import ChatbotHeader from "./components/chatbotHead";
-import ChatbotPrevChats from "./components/chatbotPrevChats";
+import ChatbotChats from "./components/chatbotChats";
 import ChatbotHelp from "./components/chatbotHelp";
-import ChatbotChatting from "./components/chatbotChatting";
+import ChatbotHome from "./components/chatbotHome";
 import ChatbotNavbar from "./components/chatbotNavbar";
 import ChatbotFooter from "./components/chatbotFoot";
-import ChatModal from "./components/ChatModal";
 import OpenChatButton from "./components/openChatButton";
+
+import ChatModal from "./components/chatModal";
+import ModalLimitation from "./components/modalLimitation";
 
 import getSessionId from "./utils/sessionID";
 import displayAnimatedMessage from "./utils/animatedMessage";
@@ -50,8 +52,10 @@ function App() {
     isInputEnabled: false,
   });
 
+  // Modals
   const [isEndChatModalOpen, setIsEndChatModalOpen] = useState(false);
   const [isDeleteChatsOpen, setIsDeleteChatsOpen] = useState(false);
+  const [isAmountChatsOpen, setIsAmountChatsOpen] = useState(false);
 
   const isLoggedIn = false; // In future
 
@@ -121,6 +125,11 @@ function App() {
   };
 
   const handleNewChat = () => {
+    if (chats.length >= 15) {
+      setIsAmountChatsOpen(true); // Show modal when limit is reached
+      return;
+    }
+
     // Start a new chat session
     const now = new Date();
     const formattedDate = now.toString().replace(" G", ".").split(".")[0]; // Format as "YYYY-MM-DD HH:MM:SS"
@@ -158,7 +167,7 @@ function App() {
         {/* Main Part */}
         <div className="main-container">
           {activePage === "home" && isVisible && (
-            <ChatbotChatting
+            <ChatbotHome
               userID={userID}
               chats={chats}
               setChats={setChats}
@@ -167,12 +176,11 @@ function App() {
               isSessionPrompt={isSessionPrompt}
               setIsSessionPrompt={setIsSessionPrompt}
               isChatEnded={isChatEnded}
-              setIsChatEnded={setIsChatEnded}
               handleNewChat={handleNewChat}
             />
           )}
           {activePage === "chats" && (
-            <ChatbotPrevChats
+            <ChatbotChats
               chats={chats}
               setChats={setChats}
               setLastChat={setLastChat}
@@ -209,6 +217,7 @@ function App() {
           question="Are you sure want to delete all chat history?"
           buttonText="Delete history"
         />
+        <ModalLimitation isOpen={isAmountChatsOpen} onClose={() => setIsAmountChatsOpen(false)} />
       </div>
       <OpenChatButton isChatboxActive={isChatboxActive} onClick={toggleChatbox} />
     </div>

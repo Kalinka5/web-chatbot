@@ -1,6 +1,6 @@
 import React from "react";
 
-import "../styles/chatbotPrevChats.css";
+import "../styles/chatbotChats.css";
 
 function ChatbotHelp() {
   return (
