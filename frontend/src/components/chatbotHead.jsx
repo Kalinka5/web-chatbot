@@ -4,11 +4,7 @@ import assistant from "../images/assistant.png";
 
 import "../styles/chatbotHead.css";
 
-function ChatbotHeader({ onClick, isModalOpen, setIsModalOpen }) {
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
-
+function ChatbotHeader({ onClickMinWindow, onClickEndChat, isEndChatButtonDisplayed }) {
   return (
     <div className="chatbox__header">
       <div className="img-name">
@@ -48,29 +44,31 @@ function ChatbotHeader({ onClick, isModalOpen, setIsModalOpen }) {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            onClick={onClick}
+            onClick={onClickMinWindow}
           >
             <path d="M5 12h14"></path>
           </svg>
         </div>
-        <div>
-          <svg
-            className="block nav-button"
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#FFFFFFFF"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            onClick={toggleModal}
-          >
-            <path d="M18 6 6 18"></path>
-            <path d="m6 6 12 12"></path>
-          </svg>
-        </div>
+        {isEndChatButtonDisplayed && (
+          <div>
+            <svg
+              className="block nav-button"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FFFFFFFF"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              onClick={onClickEndChat}
+            >
+              <path d="M18 6 6 18"></path>
+              <path d="m6 6 12 12"></path>
+            </svg>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -3,41 +3,42 @@ import React, { useEffect, useState } from "react";
 import TyppingLoader from "./home/typping";
 import MessageContainer from "./home/messageContainer";
 import Message from "./home/message";
-import NotificationMessage from "./home/notificationMessage";
-import LastChatsMessage from "./home/lastChatsMessage";
 import SendMessage from "./home/sendMessage";
 import StartChatButton from "./home/startChatButton";
+import LatestChatNotification from "./home/latestChatNotification";
 
 import api from "../api";
 
 import "../styles/chatbotHome.css";
 
-function ChatbotHome({ userID, chats, setChats, lastChat, setLastChat, isSessionPrompt, setIsSessionPrompt, isChatEnded, handleNewChat }) {
+function ChatbotHome({
+  userID,
+  chats,
+  setChats,
+  isChatNew,
+  setIsChatNew,
+  lastChat,
+  setLastChat,
+  isChatEnded,
+  handleNewChat,
+  setIsEndChatButtonDisplayed,
+  isChatboxActive,
+}) {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [isLastChatsVisible, setIsLastChatsVisible] = useState(false);
 
   useEffect(() => {
-    console.log(isSessionPrompt);
-    // Clear session prompt state on reload
-    window.onbeforeunload = () => {
-      sessionStorage.removeItem("hasSessionPrompt");
-    };
-
-    // Check if session prompt has already been shown
-    const hasSessionPrompt = sessionStorage.getItem("hasSessionPrompt");
-
-    if (hasSessionPrompt) {
-      // If the session prompt was already shown, load the chat or start a new session
-      console.log("Session prompt already handled.");
-      if (chats.length > 0) {
-        setLastChat((prevChat) => ({
-          ...prevChat,
-          messages: chats.at(lastChat.chatIndex).content,
-        }));
-      } else {
-        handleNewChat(); // Start a new chat if no chats exist
-      }
+    console.log(isChatboxActive);
+    if (chats.length === 0 || isChatNew) {
+      handleNewChat(); // Start a new chat if no chats exist
+    } else if (lastChat.chatTitle === null) {
+      setLastChat(() => ({
+        chatTitle: chats.at(0).title,
+        chatIndex: 0,
+        isInputEnabled: true,
+        messages: chats.at(0).content, // Load previous chat
+      }));
+      setIsEndChatButtonDisplayed(true); // Show end chat button
 
       // Display a welcome message
       setLastChat((prevChat) => ({
@@ -51,54 +52,25 @@ function ChatbotHome({ userID, chats, setChats, lastChat, setLastChat, isSession
               "I can help you with questions, guide you through our features, or assist with anything else you need. 💡\n\n" +
               "Go ahead, ask me anything! 🤔",
           },
-        ], // Add a new empty message for typing
+        ],
       }));
     } else {
-      // First page load or reload: show session prompt
-      console.log("Displaying session prompt.");
-      setIsSessionPrompt(true); // Show session prompt
       setLastChat((prevChat) => ({
         ...prevChat,
-        isInputEnabled: false,
-      })); // Disable input until a decision is made
+        messages: [
+          ...chats.at(lastChat.chatIndex).content, // Load previous chat messages
+          {
+            name: "Chatbot",
+            message:
+              "Hello! 👋 I'm your virtual assistant, here to make things easier for you. 🧠\n\n" +
+              "I can help you with questions, guide you through our features, or assist with anything else you need. 💡\n\n" +
+              "Go ahead, ask me anything! 🤔",
+          },
+        ],
+      }));
     }
-
-    return () => {
-      // Cleanup to avoid memory leaks
-      window.onbeforeunload = null;
-    };
+    setIsChatNew(false);
   }, []); // Dependency array ensures it runs only on mount
-
-  const handlePreviousChats = () => {
-    setIsSessionPrompt(false);
-    setIsLastChatsVisible(true); // Show last chats section
-  };
-
-  const handleChooseChat = (chatTitle, chatIndex) => {
-    sessionStorage.setItem("hasSessionPrompt", "true");
-    setIsLastChatsVisible(false);
-    setLastChat((prevChat) => ({
-      ...prevChat,
-      chatTitle: chatTitle,
-      chatIndex: chatIndex,
-      isInputEnabled: true,
-      messages: chats.at(chatIndex).content, // Load previous chat
-    }));
-    // Display a welcome message
-    setLastChat((prevChat) => ({
-      ...prevChat,
-      messages: [
-        ...prevChat.messages,
-        {
-          name: "Chatbot",
-          message:
-            "Hello! 👋 I'm your virtual assistant, here to make things easier for you. 🧠\n\n" +
-            "I can help you with questions, guide you through our features, or assist with anything else you need. 💡\n\n" +
-            "Go ahead, ask me anything! 🤔",
-        },
-      ], // Add a new empty message for typing
-    }));
-  };
 
   const addMessage = async (newMessage) => {
     const requestData = {
@@ -121,11 +93,19 @@ function ChatbotHome({ userID, chats, setChats, lastChat, setLastChat, isSession
       const data = await response.data;
       console.log("Response from server:", data.detail);
 
-      // Update the main messages array
+      // Move updated chat to the beginning of the list
       setChats((prevMessages) => {
-        const updatedMessages = [...prevMessages];
-        updatedMessages.at(lastChat.chatIndex).content.unshift(newMessage);
-        return updatedMessages;
+        const updatedChats = [...prevMessages];
+
+        // Find the chat being updated
+        const chatIndex = updatedChats.findIndex((chat) => chat.title === lastChat.chatTitle);
+        if (chatIndex !== -1) {
+          updatedChats[chatIndex].content.unshift(newMessage); // Add new message to chat
+          const updatedChat = updatedChats.splice(chatIndex, 1)[0]; // Remove from list
+          updatedChats.unshift(updatedChat); // Move to beginning
+        }
+
+        return updatedChats;
       });
     } catch (error) {
       console.error("Error posting message:", error);
@@ -193,40 +173,26 @@ function ChatbotHome({ userID, chats, setChats, lastChat, setLastChat, isSession
 
   return (
     <>
+      {/* Show latest chat notification when page reloads */}
+      {isChatboxActive && <LatestChatNotification />}
+
       <div className="gif-container">
         <div className="messages-container">
           <div className="chatbox__messages">
             {/* Show line of ended chat */}
             {isChatEnded && <div className="chat-ended-message">The chat has ended</div>}
-
             {/* Loading typping */}
             {isTyping && (
               <MessageContainer name="Chatbot">
                 <TyppingLoader />
               </MessageContainer>
             )}
-
-            {/* Show notification each rerender of component (Previous chats or new chat) */}
-            {!isChatEnded && isSessionPrompt && <NotificationMessage chats={chats} handleNewChat={handleNewChat} handlePreviousChats={handlePreviousChats} />}
-
-            {/* Last Chats Section */}
-            {isLastChatsVisible && (
-              <LastChatsMessage
-                chats={chats}
-                setIsLastChatsVisible={setIsLastChatsVisible}
-                setIsSessionPrompt={setIsSessionPrompt}
-                handleChooseChat={handleChooseChat}
-              />
-            )}
-
             {/* List of all messages */}
-            {!isSessionPrompt &&
-              !isLastChatsVisible &&
-              lastChat.messages.map((msg, index) => (
-                <MessageContainer name={msg.name} key={index}>
-                  <Message message={msg.message} />
-                </MessageContainer>
-              ))}
+            {lastChat.messages.map((msg, index) => (
+              <MessageContainer name={msg.name} key={index}>
+                <Message message={msg.message} />
+              </MessageContainer>
+            ))}
           </div>
         </div>
       </div>

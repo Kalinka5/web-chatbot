@@ -10,7 +10,7 @@ import api from "../api";
 
 import "../styles/chatbotChats.css";
 
-function ChatbotChats({ chats, setChats, setLastChat, setActivePage, setIsSessionPrompt, handleNewChat, userID, setIsDeleteChatsOpen }) {
+function ChatbotChats({ chats, setChats, setLastChat, setActivePage, handleNewChat, userID, setIsDeleteChatsOpen, setIsEndChatButtonDisplayed }) {
   const [pageNumber, setPageNumber] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [chatTitle, setChatTitle] = useState("");
@@ -24,11 +24,6 @@ function ChatbotChats({ chats, setChats, setLastChat, setActivePage, setIsSessio
   const paginatedChats = chats.slice(startIndex, startIndex + itemsPerPage);
 
   useEffect(() => {
-    // Clear session prompt state on reload
-    window.onbeforeunload = () => {
-      sessionStorage.removeItem("hasSessionPrompt");
-    };
-
     setTotalPages(Math.ceil(chats.length / itemsPerPage));
   }, [chats]);
 
@@ -41,14 +36,13 @@ function ChatbotChats({ chats, setChats, setLastChat, setActivePage, setIsSessio
   };
 
   const handleChooseChat = (chatTitle, chatIndex) => {
-    sessionStorage.setItem("hasSessionPrompt", "true");
-    setIsSessionPrompt(false);
     setLastChat((prevChat) => ({
       ...prevChat,
       chatTitle: chatTitle,
       chatIndex: chatIndex,
       isInputEnabled: true,
     }));
+    setIsEndChatButtonDisplayed(true); // Show end chat button
     setActivePage("home");
   };
 

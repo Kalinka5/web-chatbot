@@ -1,6 +1,9 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
+from datetime import timezone
+import datetime
+
 import os
 from dotenv import load_dotenv
 
@@ -16,26 +19,41 @@ messages_collection = db["messages"]
 
 
 def get_chats(session_id: str):
+    """
+    Retrieve all chats for a given session_id, sorted by last_update_time (most recent first).
+    """
     user_data = messages_collection.find_one({"session_id": session_id})
     if user_data:
-        all_chats = [{"title": chat["title"], "content": chat["content"][::-1]}
-                     for chat in user_data["messages"]][::-1]
+        all_chats = sorted(
+            [{"title": chat["title"], "content": chat["content"][::-1], "last_update_time": chat.get("last_update_time", "")}
+             for chat in user_data["chats"]],
+            key=lambda x: x["last_update_time"],
+            reverse=True  # Most recent chats first
+        )
         return all_chats
     return []
 
 
 def add_message(session_id: str, new_message: dict):
+    """
+    Add a new message to an existing chat or create a new chat.
+    Updates last_update_time for the chat.
+    """
+    current_time = datetime.datetime.now(timezone.utc)
+
     user_data = messages_collection.find_one({"session_id": session_id})
+
     if user_data:
-        # Check if the title exists
+        # Check if the chat title exists
         chat_found = False
-        for chat in user_data["messages"]:
+        for chat in user_data["chats"]:
             if chat["title"] == new_message.title:
                 chat_found = True
                 messages_collection.update_one(
-                    {"session_id": session_id,
-                        "messages.title": new_message.title},
-                    {"$push": {"messages.$.content": new_message.content}}
+                    {"session_id": session_id, "chats.title": new_message.title},
+                    {"$push": {"chats.$.content": new_message.content},
+                     # Update timestamp
+                     "$set": {"chats.$.last_update_time": current_time}}
                 )
                 break
 
@@ -43,14 +61,19 @@ def add_message(session_id: str, new_message: dict):
         if not chat_found:
             messages_collection.update_one(
                 {"session_id": session_id},
-                {"$push": {"messages": {
-                    "title": new_message.title, "content": [new_message.content]}}}
+                {"$push": {"chats": {
+                    "title": new_message.title,
+                    "content": [new_message.content],
+                    "last_update_time": current_time  # Set timestamp
+                }}}
             )
     else:
-        # Create a new session with the first message
+        # Create a new session with the first chat
         messages_collection.insert_one(
-            {"session_id": session_id, "messages": [
-                {"title": new_message.title, "content": [new_message.content]}]}
+            {"session_id": session_id, "chats": [
+                {"title": new_message.title, "content": [
+                    new_message.content], "last_update_time": current_time}
+            ]}
         )
 
 
@@ -67,14 +90,14 @@ def delete_chat(session_id: str, chat_title: str):
     if user_data:
         # Check if the chat exists
         chat_exists = any(
-            chat["title"] == chat_title for chat in user_data["messages"])
+            chat["title"] == chat_title for chat in user_data["chats"])
         if not chat_exists:
             return False  # Chat title not found, return False
 
         # Remove the chat with the matching title
         messages_collection.update_one(
             {"session_id": session_id},
-            {"$pull": {"messages": {"title": chat_title}}}
+            {"$pull": {"chats": {"title": chat_title}}}
         )
         return True  # Successfully deleted the chat
 

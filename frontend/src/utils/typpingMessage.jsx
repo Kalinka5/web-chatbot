@@ -1,4 +1,4 @@
-const displayAnimatedMessage = ({ fullMessage, setLastChat }) => {
+const displayTyppingMessage = ({ fullMessage, setLastChat }) => {
   let index = 0;
 
   setLastChat((prevChat) => ({
@@ -27,4 +27,4 @@ const displayAnimatedMessage = ({ fullMessage, setLastChat }) => {
   }, 50);
 };
 
-export default displayAnimatedMessage;
+export default displayTyppingMessage;

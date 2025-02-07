@@ -120,7 +120,6 @@ async def delete_user_all_chats(session_id: str):
     Delete all chats from the user's session.
     """
     user_data = delete_all_chats(session_id)
-    print(user_data)
     if user_data:
         return {"detail": "All chats deleted successfully.", "ok": True}
     else:
@@ -133,7 +132,6 @@ async def delete_user_chat(session_id: str, chat_title: str):
     Delete a chat from the user's session.
     """
     chat_deleted = delete_chat(session_id, chat_title)
-    print(chat_deleted)
     if chat_deleted:
         return {"detail": "Chat deleted successfully.", "ok": True}
     else:

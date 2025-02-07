@@ -13,7 +13,6 @@ import ChatModal from "./components/chatModal";
 import ModalLimitation from "./components/modalLimitation";
 
 import getSessionId from "./utils/sessionID";
-import displayAnimatedMessage from "./utils/animatedMessage";
 
 import api from "./api";
 
@@ -40,10 +39,12 @@ function App() {
 
   const [activePage, setActivePage] = useState("home"); // Main page
   const [chats, setChats] = useState([]);
-  // Control reloading page (Previous session or new chat)
-  const [isSessionPrompt, setIsSessionPrompt] = useState(false);
   // Message that chat was ended
   const [isChatEnded, setIsChatEnded] = useState(false);
+  // End chat button display
+  const [isEndChatButtonDisplayed, setIsEndChatButtonDisplayed] = useState(false);
+  // To handle new chat
+  const [isChatNew, setIsChatNew] = useState(false);
 
   const [lastChat, setLastChat] = useState({
     chatTitle: null,
@@ -57,12 +58,10 @@ function App() {
   const [isDeleteChatsOpen, setIsDeleteChatsOpen] = useState(false);
   const [isAmountChatsOpen, setIsAmountChatsOpen] = useState(false);
 
-  const isLoggedIn = false; // In future
-
   useEffect(() => {
-    const sessionId = isLoggedIn ? "TestUser" : getSessionId();
+    const sessionId = getSessionId();
     setUserID(sessionId);
-  }, [isLoggedIn]);
+  }, []);
 
   useEffect(() => {
     if (userID) {
@@ -101,6 +100,7 @@ function App() {
       isInputEnabled: false,
     }));
     setIsChatEnded(true); // Show ended message
+    setIsEndChatButtonDisplayed(false); // Hide end chat button
     setIsEndChatModalOpen(false); // Close modal
     setActivePage("home");
   };
@@ -142,27 +142,38 @@ function App() {
       isInputEnabled: true,
     }));
 
-    sessionStorage.setItem("hasSessionPrompt", "true");
     setChats((prevMessages) => [{ title: title, content: [] }, ...prevMessages]);
-    setIsSessionPrompt(false); // Hide session prompt
     setIsChatEnded(false);
+    setIsEndChatButtonDisplayed(true); // Show end chat button
     setActivePage("home");
 
     // Display a welcome message
-    displayAnimatedMessage({
-      fullMessage:
-        "Hello! 👋 I'm your virtual assistant, here to make things easier for you. 🧠\n\n" +
-        "I can help you with questions, guide you through our features, or assist with anything else you need. 💡\n\n" +
-        "Go ahead, ask me anything! 🤔",
-      setLastChat,
-    });
+    setLastChat((prevChat) => ({
+      ...prevChat,
+      messages: [
+        ...prevChat.messages,
+        {
+          name: "Chatbot",
+          message:
+            "Hello! 👋 I'm your virtual assistant, here to make things easier for you. 🧠\n\n" +
+            "I can help you with questions, guide you through our features, or assist with anything else you need. 💡\n\n" +
+            "Go ahead, ask me anything! 🤔",
+        },
+      ],
+    }));
   };
 
   return (
     <div className={`chatbox ${isVisible ? "visible" : ""}`}>
       <div className={`chatbox__support ${isChatboxActive ? "active" : ""}`}>
         {/* Header */}
-        <ChatbotHeader onClick={toggleChatbox} isModalOpen={isEndChatModalOpen} setIsModalOpen={setIsEndChatModalOpen} />
+        <ChatbotHeader
+          onClickMinWindow={toggleChatbox}
+          onClickEndChat={() => {
+            setIsEndChatModalOpen(true);
+          }}
+          isEndChatButtonDisplayed={isEndChatButtonDisplayed}
+        />
 
         {/* Main Part */}
         <div className="main-container">
@@ -171,12 +182,14 @@ function App() {
               userID={userID}
               chats={chats}
               setChats={setChats}
+              isChatNew={isChatNew}
+              setIsChatNew={setIsChatNew}
               lastChat={lastChat}
               setLastChat={setLastChat}
-              isSessionPrompt={isSessionPrompt}
-              setIsSessionPrompt={setIsSessionPrompt}
               isChatEnded={isChatEnded}
               handleNewChat={handleNewChat}
+              setIsEndChatButtonDisplayed={setIsEndChatButtonDisplayed}
+              isChatboxActive={isChatboxActive}
             />
           )}
           {activePage === "chats" && (
@@ -185,10 +198,11 @@ function App() {
               setChats={setChats}
               setLastChat={setLastChat}
               setActivePage={setActivePage}
-              setIsSessionPrompt={setIsSessionPrompt}
               handleNewChat={handleNewChat}
               userID={userID}
+              setIsChatNew={setIsChatNew}
               setIsDeleteChatsOpen={setIsDeleteChatsOpen}
+              setIsEndChatButtonDisplayed={setIsEndChatButtonDisplayed}
             />
           )}
           {activePage === "help" && <ChatbotHelp />}
