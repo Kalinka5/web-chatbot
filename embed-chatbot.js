@@ -1,7 +1,7 @@
 (function () {
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "https://kalinka5.github.io/web-chatbot/chatbot4.css";
+  link.href = "https://kalinka5.github.io/web-chatbot/chatbot.css";
   link.crossOrigin = "anonymous";
   document.head.appendChild(link);
 
