@@ -132,7 +132,7 @@ function ChatbotHome({
 
     try {
       const response = await api.post(
-        "/predict",
+        `/predict/${window.chtlConfig.chatbotId}`,
         {
           message: inputMessage,
           datetime: dateTime,
