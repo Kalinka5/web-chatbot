@@ -10,6 +10,5 @@
       "src": "/(.*)",
       "dest": "app.py"
     }
-  ],
-  "ignoreCommand": "if [ \"$VERCEL_GIT_BRANCH\" = \"gh-pages\" ]; then exit 1; fi"
+  ]
 }
