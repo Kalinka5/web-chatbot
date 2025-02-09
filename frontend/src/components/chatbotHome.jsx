@@ -80,7 +80,7 @@ function ChatbotHome({
     console.log(requestData);
 
     try {
-      const response = await api.post(`/chats/${userID}`, requestData, {
+      const response = await api.post(`/chats/${userID}/${window.chtlConfig.chatbotId}`, requestData, {
         headers: {
           "Content-Type": "application/json",
         },

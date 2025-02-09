@@ -18,11 +18,12 @@ db = client["chatbot_db"]
 messages_collection = db["messages"]
 
 
-def get_chats(session_id: str):
+def get_chats(session_id: str, chatbot_id: str):
     """
-    Retrieve all chats for a given session_id, sorted by last_update_time (most recent first).
+    Retrieve all chats for a given session_id and chatbot_id, sorted by last_update_time (most recent first).
     """
-    user_data = messages_collection.find_one({"session_id": session_id})
+    user_data = messages_collection.find_one(
+        {"session_id": session_id, "chatbot_id": chatbot_id})
     if user_data:
         all_chats = sorted(
             [{"title": chat["title"], "content": chat["content"][::-1], "last_update_time": chat.get("last_update_time", "")}
@@ -34,14 +35,15 @@ def get_chats(session_id: str):
     return []
 
 
-def add_message(session_id: str, new_message: dict):
+def add_message(session_id: str, chatbot_id: str, new_message: dict):
     """
-    Add a new message to an existing chat or create a new chat.
+    Add a new message to an existing chat or create a new chat for a specific chatbot.
     Updates last_update_time for the chat.
     """
     current_time = datetime.datetime.now(timezone.utc)
 
-    user_data = messages_collection.find_one({"session_id": session_id})
+    user_data = messages_collection.find_one(
+        {"session_id": session_id, "chatbot_id": chatbot_id})
 
     if user_data:
         # Check if the chat title exists
@@ -50,9 +52,9 @@ def add_message(session_id: str, new_message: dict):
             if chat["title"] == new_message.title:
                 chat_found = True
                 messages_collection.update_one(
-                    {"session_id": session_id, "chats.title": new_message.title},
+                    {"session_id": session_id, "chatbot_id": chatbot_id,
+                        "chats.title": new_message.title},
                     {"$push": {"chats.$.content": new_message.content},
-                     # Update timestamp
                      "$set": {"chats.$.last_update_time": current_time}}
                 )
                 break
@@ -60,7 +62,7 @@ def add_message(session_id: str, new_message: dict):
         # If the title does not exist, add a new chat with this title
         if not chat_found:
             messages_collection.update_one(
-                {"session_id": session_id},
+                {"session_id": session_id, "chatbot_id": chatbot_id},
                 {"$push": {"chats": {
                     "title": new_message.title,
                     "content": [new_message.content],
@@ -70,22 +72,19 @@ def add_message(session_id: str, new_message: dict):
     else:
         # Create a new session with the first chat
         messages_collection.insert_one(
-            {"session_id": session_id, "chats": [
+            {"session_id": session_id, "chatbot_id": chatbot_id, "chats": [
                 {"title": new_message.title, "content": [
                     new_message.content], "last_update_time": current_time}
             ]}
         )
 
 
-def delete_chat(session_id: str, chat_title: str):
+def delete_chat(session_id: str, chatbot_id: str, chat_title: str):
     """
-    Deletes a specific chat from a user's session by chat title.
-
-    :param session_id: The session ID of the user.
-    :param chat_title: The title of the chat to be deleted.
-    :return: True if the chat was deleted, False if not found.
+    Deletes a specific chat from a user's session for a specific chatbot by chat title.
     """
-    user_data = messages_collection.find_one({"session_id": session_id})
+    user_data = messages_collection.find_one(
+        {"session_id": session_id, "chatbot_id": chatbot_id})
 
     if user_data:
         # Check if the chat exists
@@ -96,7 +95,7 @@ def delete_chat(session_id: str, chat_title: str):
 
         # Remove the chat with the matching title
         messages_collection.update_one(
-            {"session_id": session_id},
+            {"session_id": session_id, "chatbot_id": chatbot_id},
             {"$pull": {"chats": {"title": chat_title}}}
         )
         return True  # Successfully deleted the chat
@@ -104,21 +103,21 @@ def delete_chat(session_id: str, chat_title: str):
     return False  # User session not found
 
 
-def delete_all_chats(session_id: str):
+def delete_all_chats(session_id: str, chatbot_id: str):
     """
-    Deletes all chats from a user's session.
-
-    :param session_id: The session ID of the user.
+    Deletes all chats from a user's session for a specific chatbot.
     """
     try:
-        # Delete all documents matching the session_id
-        result = messages_collection.delete_many({"session_id": session_id})
+        # Delete all documents matching the session_id and chatbot_id
+        result = messages_collection.delete_many(
+            {"session_id": session_id, "chatbot_id": chatbot_id})
 
         if result.deleted_count > 0:
             print(f"Successfully deleted {
-                  result.deleted_count} document(s) for session_id: {session_id}")
+                  result.deleted_count} document(s) for session_id: {session_id}, chatbot_id: {chatbot_id}")
         else:
-            print(f"No documents found with session_id: {session_id}")
+            print(
+                f"No documents found with session_id: {session_id}, chatbot_id: {chatbot_id}")
     except Exception as e:
         print(f"An error occurred: {e}")
         return False

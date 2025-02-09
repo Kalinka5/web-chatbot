@@ -48,7 +48,7 @@ function ChatbotChats({ chats, setChats, setLastChat, setActivePage, handleNewCh
 
   const handleDeleteChat = async () => {
     try {
-      const response = await api.delete(`/chats/${userID}/${encodeURIComponent(chatTitle)}`);
+      const response = await api.delete(`/chats/${userID}/${window.chtlConfig.chatbotId}/${encodeURIComponent(chatTitle)}`);
 
       if (response.data.ok) {
         console.log(`Chat "${chatTitle}" deleted successfully.`);

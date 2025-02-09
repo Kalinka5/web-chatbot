@@ -23,7 +23,6 @@ uri = os.getenv('MONGODB_URI')
 db_client = MongoClient(uri, server_api=ServerApi('1'))
 db = db_client["chatbot_db"]
 chatbots_collection = db["chatbots"]
-messages_collection = db["messages"]
 
 # deepseek_api_key = os.getenv('DEEPSEEK_API_KEY')
 
@@ -185,42 +184,42 @@ async def predict(chatbot_id: str, request: Request):
 #         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/chats/{session_id}")
-async def read_user_chats(session_id: str):
+@app.get("/chats/{session_id}/{chatbot_id}")
+async def read_user_chats(session_id: str, chatbot_id: str):
     """
-    Fetch the list of chats for a given user.
+    Fetch the list of chats for a given user session and chatbot.
     """
-    chats = get_chats(session_id)
+    chats = get_chats(session_id, chatbot_id)
     return {"chats": chats}
 
 
-@app.post("/chats/{session_id}")
-async def write_user_message(session_id: str, message: Message):
+@app.post("/chats/{session_id}/{chatbot_id}")
+async def write_user_message(session_id: str, chatbot_id: str, message: Message):
     """
-    Add a new message to the user's cyrrent chat.
+    Add a new message to the user's current chat for a specific chatbot.
     """
-    add_message(session_id, message)
+    add_message(session_id, chatbot_id, message)
     return {"detail": "Message added successfully."}
 
 
-@app.delete("/chats/{session_id}")
-async def delete_user_all_chats(session_id: str):
+@app.delete("/chats/{session_id}/{chatbot_id}")
+async def delete_user_all_chats(session_id: str, chatbot_id: str):
     """
-    Delete all chats from the user's session.
+    Delete all chats from the user's session for a specific chatbot.
     """
-    user_data = delete_all_chats(session_id)
+    user_data = delete_all_chats(session_id, chatbot_id)
     if user_data:
         return {"detail": "All chats deleted successfully.", "ok": True}
     else:
         raise HTTPException(status_code=404, detail="Session not found.")
 
 
-@app.delete("/chats/{session_id}/{chat_title}")
-async def delete_user_chat(session_id: str, chat_title: str):
+@app.delete("/chats/{session_id}/{chatbot_id}/{chat_title}")
+async def delete_user_chat(session_id: str, chatbot_id: str, chat_title: str):
     """
-    Delete a chat from the user's session.
+    Delete a chat from the user's session for a specific chatbot.
     """
-    chat_deleted = delete_chat(session_id, chat_title)
+    chat_deleted = delete_chat(session_id, chatbot_id, chat_title)
     if chat_deleted:
         return {"detail": "Chat deleted successfully.", "ok": True}
     else:
