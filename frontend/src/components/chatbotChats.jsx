@@ -35,14 +35,18 @@ function ChatbotChats({ chats, setChats, setLastChat, setActivePage, handleNewCh
     if (pageNumber < totalPages) setPageNumber(pageNumber + 1);
   };
 
-  const handleChooseChat = (chatTitle, chatIndex) => {
+  const handleChooseChat = (chatTitle, index) => {
+    // Calculate the actual index based on the current page
+    const actualIndex = (pageNumber - 1) * itemsPerPage + index;
+
+    console.log(actualIndex);
     setLastChat((prevChat) => ({
       ...prevChat,
       chatTitle: chatTitle,
-      chatIndex: chatIndex,
+      chatIndex: actualIndex,
       isInputEnabled: true,
     }));
-    setIsEndChatButtonDisplayed(true); // Show end chat button
+    setIsEndChatButtonDisplayed(true);
     setActivePage("home");
   };
 

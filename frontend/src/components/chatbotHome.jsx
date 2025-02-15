@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { playMessageSound } from "../utils/sound";
 
 import TyppingLoader from "./home/typping";
 import MessageContainer from "./home/messageContainer";
@@ -23,40 +24,19 @@ function ChatbotHome({
   handleNewChat,
   setIsEndChatButtonDisplayed,
   isChatboxActive,
+  isSoundOn,
+  isTyping,
+  setIsTyping,
 }) {
   const [inputMessage, setInputMessage] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
-    console.log(isChatboxActive);
-    if (chats.length === 0 || isChatNew) {
-      handleNewChat(); // Start a new chat if no chats exist
-    } else if (lastChat.chatTitle === null) {
-      setLastChat(() => ({
-        chatTitle: chats.at(0).title,
-        chatIndex: 0,
+    if (chats.length === 0) {
+      handleNewChat();
+    } else if ((lastChat.chatTitle === null) | !isChatNew) {
+      setLastChat((prevChat) => ({
+        ...prevChat,
         isInputEnabled: true,
-        messages: chats.at(0).content, // Load previous chat
-      }));
-      setIsEndChatButtonDisplayed(true); // Show end chat button
-
-      // Display a welcome message
-      setLastChat((prevChat) => ({
-        ...prevChat,
-        messages: [
-          ...prevChat.messages,
-          {
-            name: "Chatbot",
-            message:
-              "Hello! 👋 I'm your virtual assistant, here to make things easier for you. 🧠\n\n" +
-              "I can help you with questions, guide you through our features, or assist with anything else you need. 💡\n\n" +
-              "Go ahead, ask me anything! 🤔",
-          },
-        ],
-      }));
-    } else {
-      setLastChat((prevChat) => ({
-        ...prevChat,
         messages: [
           ...chats.at(lastChat.chatIndex).content, // Load previous chat messages
           {
@@ -68,6 +48,7 @@ function ChatbotHome({
           },
         ],
       }));
+      setIsEndChatButtonDisplayed(true);
     }
     setIsChatNew(false);
   }, []); // Dependency array ensures it runs only on mount
@@ -77,7 +58,6 @@ function ChatbotHome({
       title: lastChat.chatTitle,
       content: newMessage,
     };
-    console.log(requestData);
 
     try {
       const response = await api.post(`/chats/${userID}/${window.chtlConfig.chatbotId}`, requestData, {
@@ -127,6 +107,9 @@ function ChatbotHome({
 
     setInputMessage("");
 
+    // Play sound when message is sent
+    playMessageSound(isSoundOn);
+
     // Show typing animation
     setIsTyping(true);
 
@@ -145,12 +128,13 @@ function ChatbotHome({
       );
       const botMessage = { name: "Chatbot", message: response.data.response };
 
-      // Add bot response
+      // Add bot response and play sound
       setLastChat((prevChat) => ({
         ...prevChat,
         messages: [botMessage, ...prevChat.messages],
       }));
       addMessage(botMessage);
+      playMessageSound(isSoundOn); // Play sound for bot response
     } catch (error) {
       console.error("Error:", error);
 
@@ -183,7 +167,7 @@ function ChatbotHome({
             {isChatEnded && <div className="chat-ended-message">The chat has ended</div>}
             {/* Loading typping */}
             {isTyping && (
-              <MessageContainer name="Chatbot">
+              <MessageContainer name="Chatbot" isTyping={true}>
                 <TyppingLoader />
               </MessageContainer>
             )}

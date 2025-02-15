@@ -167,12 +167,20 @@
           border-radius: 50%;
           align-self: end;
         }
-        .messages__item {
-          margin-top: 10px;
+        .message-text {
           background: #e0e0e0;
           padding: 8px 12px;
+        }
+        .message-text.visitor {
+          background-color: rgb(224, 224, 224);
+        }
+        .messages__item {
+          margin-top: 10px;
           width: fit-content;
           max-width: 80%;
+          opacity: 0; /* Start invisible */
+          transform: translateY(20px); /* Start below final position */
+          animation: messageAppear 0.4s ease forwards; /* Smooth animation */
 
           .chatbot-message {
             font-size: 18px;
@@ -197,11 +205,12 @@
             animation: fadeInUp 0.6s 0.9s forwards;
           }
           .is-typing {
-            height: 50px;
-            width: 85px;
+            height: 40px;
+            width: 80px;
+            display: flex;
             justify-content: space-around;
             align-items: center;
-            display: flex;
+            padding: 0 10px;
 
             .jump1,
             .jump2,
@@ -211,33 +220,33 @@
               width: 10px;
               height: 10px;
               border-radius: 100%;
-              background-color: gray;
+              background-color: #1435eb;
+              opacity: 0.8;
             }
             .jump1 {
-              animation: typing 1.5s linear infinite;
-              animation-delay: 01.1s;
+              animation: typing 2s linear infinite;
+              animation-delay: 0.1s;
             }
             .jump2 {
-              animation: typing 1.5s linear infinite;
-              animation-delay: 01.2s;
+              animation: typing 2s linear infinite;
+              animation-delay: 0.2s;
             }
             .jump3 {
-              animation: typing 1.5s linear infinite;
-              animation-delay: 01.3s;
+              animation: typing 2s linear infinite;
+              animation-delay: 0.3s;
             }
             .jump4 {
-              animation: typing 1.5s linear infinite;
-              animation-delay: 01.4s;
+              animation: typing 2s linear infinite;
+              animation-delay: 0.4s;
             }
             .jump5 {
-              animation: typing 1.5s linear infinite;
-              animation-delay: 1.5s;
+              animation: typing 2s linear infinite;
+              animation-delay: 0.5s;
             }
           }
         }
         .messages__item.visitor {
           margin-right: auto;
-          background-color: rgb(224, 224, 224);
           color: black;
           border-top-left-radius: 20px;
           border-top-right-radius: 20px;
@@ -297,24 +306,36 @@
 @keyframes typing {
   0% {
     transform: translateY(0px);
+    background-color: #1435eb;
   }
   25% {
     transform: translateY(0px);
   }
   35% {
-    transform: translateY(15px);
+    transform: translateY(-14px);
   }
   45% {
     transform: translateY(0px);
   }
   60% {
-    transform: translateY(-15px);
+    transform: translateY(-14px);
   }
   75% {
-    background-color: var(--primaryText);
+    background-color: #4361ee;
     transform: translateY(0px);
   }
   100% {
     transform: translateY(0px);
+  }
+}
+/* Add new animation keyframes */
+@keyframes messageAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }

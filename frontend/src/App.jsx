@@ -48,10 +48,12 @@ function App() {
 
   const [lastChat, setLastChat] = useState({
     chatTitle: null,
-    chatIndex: -1,
+    chatIndex: 0,
     messages: [],
     isInputEnabled: false,
   });
+
+  const [isTyping, setIsTyping] = useState(false);
 
   // Modals
   const [isEndChatModalOpen, setIsEndChatModalOpen] = useState(false);
@@ -130,6 +132,8 @@ function App() {
       return;
     }
 
+    setIsChatNew(true);
+
     // Start a new chat session
     const now = new Date();
     const formattedDate = now.toString().replace(" G", ".").split(".")[0]; // Format as "YYYY-MM-DD HH:MM:SS"
@@ -147,20 +151,26 @@ function App() {
     setIsEndChatButtonDisplayed(true); // Show end chat button
     setActivePage("home");
 
-    // Display a welcome message
-    setLastChat((prevChat) => ({
-      ...prevChat,
-      messages: [
-        ...prevChat.messages,
-        {
-          name: "Chatbot",
-          message:
-            "Hello! 👋 I'm your virtual assistant, here to make things easier for you. 🧠\n\n" +
-            "I can help you with questions, guide you through our features, or assist with anything else you need. 💡\n\n" +
-            "Go ahead, ask me anything! 🤔",
-        },
-      ],
-    }));
+    setIsTyping(true);
+
+    // After 2 seconds, show the welcome message
+    setTimeout(() => {
+      setIsTyping(false);
+      // Display a welcome message
+      setLastChat((prevChat) => ({
+        ...prevChat,
+        messages: [
+          ...prevChat.messages,
+          {
+            name: "Chatbot",
+            message:
+              "Hello! 👋 I'm your virtual assistant, here to make things easier for you. 🧠\n\n" +
+              "I can help you with questions, guide you through our features, or assist with anything else you need. 💡\n\n" +
+              "Go ahead, ask me anything! 🤔",
+          },
+        ],
+      }));
+    }, 2000);
   };
 
   return (
@@ -173,6 +183,7 @@ function App() {
             setIsEndChatModalOpen(true);
           }}
           isEndChatButtonDisplayed={isEndChatButtonDisplayed}
+          handleNewChat={handleNewChat}
         />
 
         {/* Main Part */}
@@ -190,6 +201,8 @@ function App() {
               handleNewChat={handleNewChat}
               setIsEndChatButtonDisplayed={setIsEndChatButtonDisplayed}
               isChatboxActive={isChatboxActive}
+              isTyping={isTyping}
+              setIsTyping={setIsTyping}
             />
           )}
           {activePage === "chats" && (
