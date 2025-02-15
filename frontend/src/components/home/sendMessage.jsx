@@ -1,8 +1,9 @@
 import React from "react";
+import { IoSendSharp } from "react-icons/io5";
 
 import "../../styles/sendMessage.css";
 
-function SendMessage({ lastChat, inputMessage, setInputMessage, handleSendMessage }) {
+function SendMessage({ inputMessage, setInputMessage, handleSendMessage }) {
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
       handleSendMessage();
@@ -20,8 +21,8 @@ function SendMessage({ lastChat, inputMessage, setInputMessage, handleSendMessag
           onChange={(e) => setInputMessage(e.target.value)}
           onKeyUp={handleKeyPress}
         />
-        <button className="send__button" onClick={handleSendMessage}>
-          Send
+        <button className={`send__button ${inputMessage.trim() ? "active" : ""}`} onClick={handleSendMessage} disabled={!inputMessage.trim()}>
+          <IoSendSharp size={20} />
         </button>
       </div>
     </div>

@@ -36,6 +36,7 @@ function ChatbotHome({
     } else if ((lastChat.chatTitle === null) | !isChatNew) {
       setLastChat((prevChat) => ({
         ...prevChat,
+        chatTitle: chats.at(lastChat.chatIndex).title,
         isInputEnabled: true,
         messages: [
           ...chats.at(lastChat.chatIndex).content, // Load previous chat messages
@@ -54,13 +55,14 @@ function ChatbotHome({
   }, []); // Dependency array ensures it runs only on mount
 
   const addMessage = async (newMessage) => {
+    console.log(lastChat.chatTitle);
     const requestData = {
       title: lastChat.chatTitle,
       content: newMessage,
     };
 
     try {
-      const response = await api.post(`/chats/${userID}/${window.chtlConfig.chatbotId}`, requestData, {
+      const response = await api.post(`/chats/${userID}/1468965622`, requestData, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -115,7 +117,7 @@ function ChatbotHome({
 
     try {
       const response = await api.post(
-        `/predict/${window.chtlConfig.chatbotId}`,
+        `/predict/1468965622`,
         {
           message: inputMessage,
           datetime: dateTime,
