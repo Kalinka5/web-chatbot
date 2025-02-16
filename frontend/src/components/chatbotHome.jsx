@@ -62,7 +62,7 @@ function ChatbotHome({
     };
 
     try {
-      const response = await api.post(`/chats/${userID}/1468965622`, requestData, {
+      const response = await api.post(`/chats/${userID}/${window.chtlConfig.chatbotId}`, requestData, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -117,7 +117,7 @@ function ChatbotHome({
 
     try {
       const response = await api.post(
-        `/predict/1468965622`,
+        `/predict/${window.chtlConfig.chatbotId}`,
         {
           message: inputMessage,
           datetime: dateTime,

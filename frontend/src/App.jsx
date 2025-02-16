@@ -82,7 +82,7 @@ function App() {
 
   const clearChats = async () => {
     try {
-      const response = await api.delete(`/chats/${userID}/1468965622`);
+      const response = await api.delete(`/chats/${userID}/${window.chtlConfig.chatbotId}`);
 
       if (response.data.ok) {
         console.log("All chats deleted successfully.");
@@ -111,7 +111,7 @@ function App() {
     console.log(userID);
 
     try {
-      const response = await api.get(`/chats/${userID}/1468965622`);
+      const response = await api.get(`/chats/${userID}/${window.chtlConfig.chatbotId}`);
       console.log(response);
 
       if (response.status !== 200) {
